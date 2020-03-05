@@ -1,6 +1,5 @@
 # Books-Shop-Management-System
 This project was created only with the scope of school project by using only MySQL and Python only:
-serious
 
 
 In this project modules used are:
@@ -21,7 +20,7 @@ In this project modules used are:
 
 Key Features:-
 
-1. This code is of approx 1400 lines and it consists of every function which an bookshop owner requires
+1. This code is of approx 1400 lines and it consists of every function which an bookshop owner requires.
 
 2. It helps new users to register themselves and order/return/replace/check details of order/view details of book, etc.
 
@@ -33,4 +32,4 @@ Key Features:-
 
 6. Administrator has all the rights of viewing, updating, deleting users (not passwords), and also can view/cancel/replace/return orders of a specific user.
 
-7. Errors are handled very serious.
+7. Errors are handled very seriously.
