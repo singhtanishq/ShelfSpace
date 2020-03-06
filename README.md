@@ -1,5 +1,5 @@
 # Books-Shop-Management-System
-This project was created only with the scope of school project by using only MySQL and Python only:
+This project was created only with the scope of school project by using MySQL and Python only:
 
 
 In this project modules used are:
