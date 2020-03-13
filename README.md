@@ -18,7 +18,7 @@ In this project modules used are:
 
 7. datetime (for calculating date differences)
 
-Key Features:-
+### Key Features:
 
 - This code consists of approximately 1400 lines and it has every function that a bookshop owner requires.
 
@@ -34,7 +34,7 @@ Key Features:-
 
 - Errors are handled very seriously in this whole project.
 
-Drawbacks:-
+### Drawbacks:
 
 - The only drawback is that no GUI has been used, therefore everything happens in the shell itself. However, real time databases are used and emails are send.
 
