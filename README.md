@@ -1,4 +1,4 @@
-# Books-Shop-Management-System
+# ShelfSpace : Books Shop Management System
 This project was created only with the scope of school project by using MySQL and Python only:
 
 
