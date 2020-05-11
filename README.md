@@ -67,9 +67,3 @@ ShelfSpace harnesses the power of several libraries and technologies to deliver 
 
 ShelfSpace is more than just a management system—it’s your personal assistant for running a bookshop effectively. By automating routine tasks, ensuring secure data handling, and providing a seamless experience for users and administrators alike, ShelfSpace empowers bookshop owners to focus on their passion for books while the system handles the operational complexity.
 
----
-
-### Future Prospects
-While ShelfSpace currently operates in a shell-based environment, its architecture is robust and scalable, making it an excellent foundation for future integration with graphical user interfaces (GUIs) or web-based frontends.
-
-Join the journey to redefine bookshop management with ShelfSpace: Your ultimate backend solution for bookstore excellence.
