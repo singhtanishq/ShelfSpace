@@ -10,7 +10,7 @@ Whether you're looking to enhance customer experience, automate routine tasks, o
 
 ShelfSpace is a powerful backend-driven management tool designed to handle critical bookstore operations with precision. By leveraging the versatility of Python and the reliability of MySQL, this system ensures seamless data handling, error management, and user interactions.
 
-With approximately **1400 lines of meticulously written code**, ShelfSpace is loaded with functionalities that enable efficient user registration, order management, email notifications, and automated invoice generation, making it a true asset for bookstore administrators.
+ShelfSpace is loaded with functionalities that enable efficient user registration, order management, email notifications, and automated invoice generation, making it a true asset for bookstore administrators.
 
 ---
 
