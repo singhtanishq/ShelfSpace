@@ -8,13 +8,14 @@ from typing import List, Optional
 
 from sqlalchemy import (
     Boolean,
+    Column,
     DateTime,
     ForeignKey,
     Index,
     Numeric,
     String,
+    Table,
     Text,
-    UniqueConstraint,
     func,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -32,6 +33,21 @@ def slugify(value: str) -> str:
 class BookFormat(str, enum.Enum):
     PAPERBACK = "paperback"
     HARDCOVER = "hardcover"
+
+
+book_authors = Table(
+    "book_authors",
+    Base.metadata,
+    Column("book_id", ForeignKey("books.id", ondelete="CASCADE"), primary_key=True),
+    Column("author_id", ForeignKey("authors.id", ondelete="CASCADE"), primary_key=True),
+)
+
+book_categories = Table(
+    "book_categories",
+    Base.metadata,
+    Column("book_id", ForeignKey("books.id", ondelete="CASCADE"), primary_key=True),
+    Column("category_id", ForeignKey("categories.id", ondelete="CASCADE"), primary_key=True),
+)
 
 
 class Author(Base):
