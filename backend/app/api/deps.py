@@ -10,9 +10,11 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import decode_token
 from app.models import User, UserRole
-from app.utils.exceptions import AuthError, PermissionDeniedError
+from app.utils.exceptions import AppError, AuthError, PermissionDeniedError
 
 bearer_scheme = HTTPBearer(auto_error=False)
+
+AuthErrors = (AuthError, PermissionDeniedError, AppError)
 
 
 def _extract_token(
@@ -55,13 +57,8 @@ def get_optional_user(
         return None
     try:
         return get_current_user(request, credentials, db)
-    except AppErrors:
+    except AuthErrors:
         return None
-
-
-from app.utils.exceptions import AppError as _AppError  # noqa: E402
-
-AppErrors = (AuthError, PermissionDeniedError, _AppError)
 
 
 def get_current_admin_user(user: User = Depends(get_current_user)) -> User:
