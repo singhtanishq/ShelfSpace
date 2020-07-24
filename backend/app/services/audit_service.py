@@ -20,19 +20,22 @@ def log(
     entity_id: Optional[Any] = None,
     detail: Optional[dict] = None,
 ) -> None:
-    """Record an audit entry in the same transaction as the mutation itself."""
+    """Record an audit entry in the same transaction as the mutation itself.
+
+    Uses a SAVEPOINT so that an auditing failure never aborts the business
+    operation (and vice versa).
+    """
     try:
-        db.add(
-            AuditLog(
-                actor_id=getattr(actor, "id", None),
-                actor_name=getattr(actor, "full_name", None) or getattr(actor, "username", None),
-                action=action,
-                entity_type=entity_type,
-                entity_id=str(entity_id) if entity_id is not None else None,
-                detail=detail,
+        with db.begin_nested():
+            db.add(
+                AuditLog(
+                    actor_id=getattr(actor, "id", None),
+                    actor_name=getattr(actor, "full_name", None) or getattr(actor, "username", None),
+                    action=action,
+                    entity_type=entity_type,
+                    entity_id=str(entity_id) if entity_id is not None else None,
+                    detail=detail,
+                )
             )
-        )
-        db.flush()
     except Exception:  # auditing must never break the business operation
-        db.rollback()
         logger.exception("Failed to write audit log for action=%s", action)
