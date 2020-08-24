@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2 style="margin:0 0 12px;font-size:19px;color:#111827;">Verify your email address</h2>
+  <p style="margin:0 0 20px;">Hi {{ user_name }}, thanks for creating an account at {{ store_name }}. Please confirm your email address to activate all account features.</p>
+  <p style="margin:0 0 24px;">
+    <a href="{{ verification_url }}" style="display:inline-block;background:#1e3a5f;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:600;">Verify email</a>
+  </p>
+  <p style="margin:0;color:#6b7280;font-size:13px;">This link expires in 48 hours. If you didn't create this account, you can safely ignore this email.</p>
+{% endblock %}

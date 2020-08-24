@@ -1,0 +1,7 @@
+Hi {{ user_name }},
+
+Thanks for creating an account at {{ store_name }}. Please confirm your email address:
+
+{{ verification_url }}
+
+This link expires in 48 hours. If you didn't create this account, you can safely ignore this email.
