@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2 style="margin:0 0 12px;font-size:19px;color:#111827;">Order {{ order_number }} — {{ headline }}</h2>
+  <p style="margin:0 0 16px;">Hi {{ user_name }}, {{ message }}</p>
+  {% if note %}
+  <p style="margin:0 0 16px;padding:12px 16px;background:#f9fafb;border-left:3px solid #1e3a5f;color:#374151;">{{ note }}</p>
+  {% endif %}
+  <p style="margin:0;color:#6b7280;font-size:13px;">Current status: <strong>{{ status_label }}</strong></p>
+{% endblock %}
