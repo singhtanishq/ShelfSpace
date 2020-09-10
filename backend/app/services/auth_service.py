@@ -17,7 +17,7 @@ from app.core.security import (
     hash_token,
     verify_password,
 )
-from app.models import Address, User, UserRefreshToken, UserRole
+from app.models import Address, NotificationType, User, UserRefreshToken, UserRole
 from app.schemas.user import (
     AddressCreate,
     AddressUpdate,
