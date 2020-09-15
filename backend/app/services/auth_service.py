@@ -1,6 +1,6 @@
 """Authentication and account management business logic."""
 
-import secrets
+import secrets  # noqa: F401  (reserved for future token schemes)
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Tuple
 
@@ -82,7 +82,7 @@ def register(db: Session, data: RegisterRequest) -> Tuple[User, Optional[str]]:
     notification_service.notify(
         db,
         user=user,
-        type=notification_service.NotificationType.ACCOUNT,
+        type=NotificationType.ACCOUNT,
         title="Welcome to ShelfSpace",
         body="Your account has been created. Verify your email to get the full experience.",
         link="/account",
