@@ -6,21 +6,21 @@ payment rows are created and the cart is cleared atomically — overselling and
 half-committed orders are impossible.
 """
 
-from datetime import datetime, timedelta, timezone
-from typing import List, Optional
+from datetime import datetime, timezone
+from typing import Optional
 
-from sqlalchemy import func
 from sqlalchemy.orm import Session, selectinload
 
-from app.core.logging import get_logger
 from app.models import (
-    CANCELLABLE_STATUSES,
     ALLOWED_STATUS_TRANSITIONS,
-    Address,
     Book,
+    CANCELLABLE_STATUSES,
     Cart,
+    CartItem,
     Coupon,
+    Address,
     InventoryChangeType,
+    InventoryTransaction,
     NotificationType,
     Order,
     OrderItem,
@@ -31,9 +31,8 @@ from app.models import (
     PaymentStatus,
     User,
 )
-from app.schemas.order import CheckoutRequest, StatusUpdateRequest
+from app.schemas.order import CheckoutRequest
 from app.services import (
-    cart_service,
     coupon_service,
     email_service,
     inventory_service,
@@ -42,8 +41,6 @@ from app.services import (
     settings_service,
 )
 from app.utils.exceptions import BusinessRuleError, NotFoundError, ValidationError
-
-logger = get_logger(__name__)
 
 STATUS_LABELS = {
     "pending": "Pending",
@@ -65,7 +62,12 @@ STATUS_LABELS = {
 def checkout(db: Session, user: User, data: CheckoutRequest) -> Order:
     cart = (
         db.query(Cart)
-        .options(selectinload(Cart.items).selectinload(CartItem := __import__("app.models", fromlist=["CartItem"]).CartItem).selectinload(Book.authors))
+        .options(
+            selectinload(Cart.items)
+            .selectinload(CartItem.book)
+            .selectinload(Book.authors),
+            selectinload(Cart.items).selectinload(CartItem.book).selectinload(Book.inventory),
+        )
         .filter(Cart.user_id == user.id)
         .first()
     )
@@ -74,15 +76,15 @@ def checkout(db: Session, user: User, data: CheckoutRequest) -> Order:
 
     shipping_address = _resolve_shipping_address(db, user, data)
 
-    # Authoritative re-validation of every line against live stock.
-    book_ids = [item.book_id for item in cart.items]
+    # Authoritative re-validation of every line against live (locked) stock.
     inventory_rows = {
-        inv.book_id: inv for inv in inventory_service.lock_inventory(db, book_ids)
+        inv.book_id: inv
+        for inv in inventory_service.lock_inventory(db, [item.book_id for item in cart.items])
     }
     for item in cart.items:
         book = item.book
         if book is None or not book.is_active:
-            raise BusinessRuleError(f"'{item.book.title if item.book else 'An item'}' is no longer available.")
+            raise BusinessRuleError("One of the items in your cart is no longer available.")
         inv = inventory_rows[book.id]
         if item.quantity > inv.available_quantity:
             raise BusinessRuleError(
@@ -90,11 +92,8 @@ def checkout(db: Session, user: User, data: CheckoutRequest) -> Order:
                 "Please adjust your cart."
             )
 
-    # Totals (server-computed; client values are never trusted).
-    subtotal = 0.0
-    for item in cart.items:
-        subtotal += float(item.book.effective_price) * item.quantity
-    subtotal = round(subtotal, 2)
+    # Totals are always computed server-side; client values are never trusted.
+    subtotal = round(sum(float(item.book.effective_price) * item.quantity for item in cart.items), 2)
 
     discount = 0.0
     coupon = db.get(Coupon, cart.coupon_id) if cart.coupon_id else None
@@ -133,7 +132,6 @@ def checkout(db: Session, user: User, data: CheckoutRequest) -> Order:
     )
     db.add(order)
     db.flush()
-
     order.order_number = f"SS-{datetime.now(timezone.utc):%Y%m%d}-{order.id:05d}"
 
     for item in cart.items:
@@ -154,7 +152,7 @@ def checkout(db: Session, user: User, data: CheckoutRequest) -> Order:
         inv = inventory_rows[book.id]
         inv.stock_quantity -= item.quantity
         db.add(
-            __import__("app.models", fromlist=["InventoryTransaction"]).InventoryTransaction(
+            InventoryTransaction(
                 book_id=book.id,
                 change=-item.quantity,
                 change_type=InventoryChangeType.SALE,
@@ -165,9 +163,6 @@ def checkout(db: Session, user: User, data: CheckoutRequest) -> Order:
             )
         )
         book.sales_count += item.quantity
-
-    if method == PaymentMethod.PAID if False else False:
-        pass
 
     db.add(
         Payment(
@@ -192,7 +187,7 @@ def checkout(db: Session, user: User, data: CheckoutRequest) -> Order:
     if coupon is not None:
         coupon.used_count += 1
 
-    # Empty the cart.
+    # Empty the cart as part of the same transaction.
     cart.items.clear()
     cart.coupon_id = None
 
@@ -203,7 +198,10 @@ def checkout(db: Session, user: User, data: CheckoutRequest) -> Order:
         template="order_confirmation",
         subject=f"Order {order.order_number} confirmed",
         headline="Order confirmed",
-        message="Thank you for your order! It is being processed and you will receive updates as it moves through fulfilment.",
+        message=(
+            "Thank you for your order! It is being processed and you will receive updates "
+            "as it moves through fulfilment."
+        ),
     )
     notification_service.notify(
         db,
@@ -221,14 +219,15 @@ def checkout(db: Session, user: User, data: CheckoutRequest) -> Order:
 # ---------------------------------------------------------------------------
 
 
-def get_order(db: Session, order_number: str, *, user: Optional[User] = None, require_admin: bool = False) -> Order:
+def get_order(
+    db: Session, order_number: str, *, user: Optional[User] = None, require_admin: bool = False
+) -> Order:
     order = (
         db.query(Order)
         .options(
             selectinload(Order.items),
             selectinload(Order.status_history),
             selectinload(Order.returns).selectinload("items"),
-            selectinload(Order.returns).selectinload("user"),
         )
         .filter(Order.order_number == order_number)
         .first()
@@ -251,7 +250,7 @@ def list_orders(
 ) -> tuple:
     query = (
         db.query(Order)
-        .options(selectinload(Order.items), selectinload(Order.returns))
+        .options(selectinload(Order.items), selectinload(Order.returns).selectinload("items"))
         .order_by(Order.placed_at.desc(), Order.id.desc())
     )
     if user is not None:
@@ -259,8 +258,7 @@ def list_orders(
     if status:
         query = query.filter(Order.status == OrderStatus(status))
     if q:
-        term = f"%{q.strip()}%"
-        query = query.filter(Order.order_number.ilike(term))
+        query = query.filter(Order.order_number.ilike(f"%{q.strip()}%"))
     total = query.count()
     orders = query.offset((page - 1) * page_size).limit(page_size).all()
     return orders, total
@@ -271,24 +269,34 @@ def list_orders(
 # ---------------------------------------------------------------------------
 
 
-def cancel_order(db: Session, order: Order, actor: User, note: Optional[str] = None, is_admin: bool = False) -> Order:
+def cancel_order(
+    db: Session, order: Order, actor: User, note: Optional[str] = None, is_admin: bool = False
+) -> Order:
     if order.status not in CANCELLABLE_STATUSES:
         raise BusinessRuleError(
             f"An order with status '{STATUS_LABELS[order.status.value]}' can no longer be cancelled."
         )
-    return transition_status(db, order, OrderStatus.CANCELLED, actor=actor, note=note or "Order cancelled", is_admin=is_admin)
+    return transition_status(
+        db, order, OrderStatus.CANCELLED, actor=actor, note=note or "Order cancelled", is_admin=is_admin
+    )
 
 
-def transition_status(db: Session, order: Order, new_status: OrderStatus, *, actor: User, note: Optional[str], is_admin: bool = False) -> Order:
+def transition_status(
+    db: Session,
+    order: Order,
+    new_status: OrderStatus,
+    *,
+    actor: User,
+    note: Optional[str],
+    is_admin: bool = False,
+) -> Order:
     """Apply a validated status transition with all side effects."""
-    from app.models import InventoryTransaction
-
     if order.status == new_status:
         raise BusinessRuleError("The order is already in this status.")
-    allowed = ALLOWED_STATUS_TRANSITIONS.get(order.status, set())
-    if new_status not in allowed:
+    if new_status not in ALLOWED_STATUS_TRANSITIONS.get(order.status, set()):
         raise BusinessRuleError(
-            f"Transition '{STATUS_LABELS[order.status.value]}' → '{STATUS_LABELS[new_status.value]}' is not allowed."
+            f"Transition '{STATUS_LABELS[order.status.value]}' → "
+            f"'{STATUS_LABELS[new_status.value]}' is not allowed."
         )
     if new_status == OrderStatus.CANCELLED and not is_admin and actor.id != order.user_id:
         raise NotFoundError("Order not found.")
@@ -299,7 +307,6 @@ def transition_status(db: Session, order: Order, new_status: OrderStatus, *, act
 
     if new_status == OrderStatus.CANCELLED:
         order.cancelled_at = now
-        # Restock every item and refund mock payments.
         for item in order.items:
             if item.book_id is not None:
                 try:
@@ -314,7 +321,7 @@ def transition_status(db: Session, order: Order, new_status: OrderStatus, *, act
                         created_by=actor.id,
                     )
                 except (NotFoundError, BusinessRuleError):
-                    inv = None  # book archived with inventory; restock impossible
+                    inv = None  # inventory row gone (book deleted); nothing to restock
                 if inv is not None:
                     book = db.get(Book, item.book_id)
                     if book is not None:
@@ -325,7 +332,7 @@ def transition_status(db: Session, order: Order, new_status: OrderStatus, *, act
         message = "Your order has been cancelled."
         if order.payment_status == PaymentStatus.REFUNDED:
             message += " Your payment has been refunded to the original payment method."
-        headline, email_tpl = "Order cancelled", "order_status"
+        headline = "Order cancelled"
 
     elif new_status == OrderStatus.DELIVERED:
         order.delivered_at = now
@@ -333,19 +340,15 @@ def transition_status(db: Session, order: Order, new_status: OrderStatus, *, act
             order.payment_status = PaymentStatus.PAID
             _record_cod_capture(db, order)
         message = "Your order has been delivered. We hope you enjoy your books!"
-        headline, email_tpl = "Delivered", "order_status"
+        headline = "Delivered"
 
     elif new_status == OrderStatus.RETURNED:
         message = "Your return has been completed and the refund is on its way."
-        headline, email_tpl = "Returned", "order_status"
+        headline = "Returned"
 
     else:
-        message = (
-            f"Good news! Your order is now {STATUS_LABELS[new_status.value].lower()}."
-            if new_status in (OrderStatus.CONFIRMED, OrderStatus.PROCESSING, OrderStatus.SHIPPED, OrderStatus.OUT_FOR_DELIVERY)
-            else f"Your order status changed to {STATUS_LABELS[new_status.value].lower()}."
-        )
-        headline, email_tpl = STATUS_LABELS[new_status.value], "order_status"
+        message = f"Good news! Your order is now {STATUS_LABELS[new_status.value].lower()}."
+        headline = STATUS_LABELS[new_status.value]
 
     db.add(
         OrderStatusHistory(
@@ -360,7 +363,7 @@ def transition_status(db: Session, order: Order, new_status: OrderStatus, *, act
         db,
         order.user,
         order,
-        template=email_tpl,
+        template="order_status",
         subject=f"Update on order {order.order_number}",
         headline=headline,
         message=message,
@@ -374,16 +377,6 @@ def transition_status(db: Session, order: Order, new_status: OrderStatus, *, act
         link=f"/account/orders/{order.order_number}",
     )
     return order
-
-
-def transition_deadline_info(order: Order) -> dict:
-    """Return window metadata for the order detail view."""
-    window_days = 0
-    delivered = order.delivered_at
-    if delivered is not None:
-        delivered = delivered if delivered.tzinfo else delivered.replace(tzinfo=timezone.utc)
-        window_days = (datetime.now(timezone.utc) - delivered).days
-    return {"days_since_delivery": window_days}
 
 
 # ---------------------------------------------------------------------------
@@ -453,8 +446,9 @@ def _record_refund_payment(db: Session, order: Order) -> None:
     )
 
 
-def _queue_order_email(db: Session, user: User, order: Order, *, template: str, subject: str, headline: str, message: str) -> None:
-    currency = settings_service.get_str(db, "currency")
+def _queue_order_email(
+    db: Session, user: User, order: Order, *, template: str, subject: str, headline: str, message: str
+) -> None:
     email_service.queue_email(
         db,
         to_email=user.email,
@@ -466,11 +460,9 @@ def _queue_order_email(db: Session, user: User, order: Order, *, template: str, 
             "items": [
                 {"title": i.title, "quantity": i.quantity, "line_total": float(i.line_total)}
                 for i in order.items
-            ]
-            if template == "order_confirmation"
-            else [],
+            ],
             "total": float(order.total),
-            "currency": currency,
+            "currency": settings_service.get_str(db, "currency"),
             "payment_method": order.payment_method.value,
             "status_label": STATUS_LABELS[order.status.value],
             "headline": headline,
