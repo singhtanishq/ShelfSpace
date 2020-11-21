@@ -33,8 +33,6 @@ from app.schemas.order import ReturnCreate, ReturnDecision
 from app.services import email_service, inventory_service, notification_service, settings_service
 from app.utils.exceptions import BusinessRuleError, NotFoundError, ValidationError
 
-CURRENCY = "INR"
-
 
 def return_window_days(db: Session) -> int:
     return settings_service.get_int(db, "return_window_days")
@@ -242,11 +240,12 @@ def _complete_request(db: Session, request: ReturnRequest) -> None:
                 except (NotFoundError, BusinessRuleError):
                     pass
         request.refund_status = RefundStatus.COMPLETED
-        fully_returned = _remaining_quantities(db, order)
-        if all(qty <= 0 for qty in fully_returned.values()) and order.status == OrderStatus.DELIVERED:
-            order.status = OrderStatus.RETURNED
-        if order.payment_status.value == "paid":
-            order.payment_status = RefundStatusToPayment(request.refund_status)
+        remaining = _remaining_quantities(db, order)
+        if order.status == OrderStatus.DELIVERED:
+            if all(qty <= 0 for qty in remaining.values()):
+                order.status = OrderStatus.RETURNED
+            if order.payment_status == PaymentStatus.PAID:
+                order.payment_status = PaymentStatus.REFUNDED
     else:  # replacement: issue new copies from stock
         for ri in request.items:
             if ri.order_item.book_id is not None:
@@ -264,12 +263,6 @@ def _complete_request(db: Session, request: ReturnRequest) -> None:
                     )
                 except (NotFoundError, BusinessRuleError):
                     pass
-
-
-def RefundStatusToPayment(refund_status: RefundStatus):
-    from app.models import PaymentStatus
-
-    return PaymentStatus.REFUNDED if refund_status == RefundStatus.COMPLETED else PaymentStatus.PENDING
 
 
 def _queue_request_email(
