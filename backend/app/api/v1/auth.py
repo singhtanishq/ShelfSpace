@@ -17,6 +17,7 @@ from app.schemas.user import (
     ResendVerificationRequest,
     ResetPasswordRequest,
     TokenPair,
+    UpdateProfileRequest,
     UserPublic,
     VerifyEmailRequest,
 )
@@ -105,7 +106,7 @@ def me(user=Depends(get_current_user)):
 
 @router.put("/me", response_model=UserPublic)
 def update_me(
-    data: UpdateProfileWrapper,
+    data: UpdateProfileRequest,
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
@@ -120,6 +121,3 @@ def change_password(
 ):
     auth_service.change_password(db, user, data.current_password, data.new_password)
     return AuthMessage(message="Your password has been updated.")
-
-
-from app.schemas.user import UpdateProfileRequest as UpdateProfileWrapper  # noqa: E402
