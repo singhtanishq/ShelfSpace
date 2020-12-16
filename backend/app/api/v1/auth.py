@@ -22,7 +22,6 @@ from app.schemas.user import (
     VerifyEmailRequest,
 )
 from app.services import auth_service
-from app.utils.exceptions import AuthError
 from app.utils.rate_limit import enforce_rate_limit
 
 router = APIRouter(prefix="/auth", tags=["auth"])
