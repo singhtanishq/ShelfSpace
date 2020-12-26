@@ -127,7 +127,7 @@ def book_reviews(
 @router.post("/books/{slug}/reviews", response_model=ReviewPublic, status_code=201)
 def create_review(
     slug: str,
-    data: "ReviewCreate",
+    data: ReviewCreate,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
@@ -139,7 +139,7 @@ def create_review(
 @router.put("/reviews/{review_id}", response_model=ReviewPublic)
 def update_review(
     review_id: int,
-    data: "ReviewUpdate",
+    data: ReviewUpdate,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
@@ -156,19 +156,16 @@ def delete_review(
     review_service.delete_review(db, user, review_id)
 
 
-@router.get("/categories", response_model=list)
+@router.get("/categories", response_model=list[CategoryPublic])
 def list_categories(db: Session = Depends(get_db)):
     return db.query(Category).order_by(Category.name).all()
 
 
-@router.get("/authors", response_model=list)
+@router.get("/authors", response_model=list[AuthorPublic])
 def list_authors(db: Session = Depends(get_db)):
     return db.query(Author).order_by(Author.name).all()
 
 
-@router.get("/publishers", response_model=list)
+@router.get("/publishers", response_model=list[PublisherPublic])
 def list_publishers(db: Session = Depends(get_db)):
     return db.query(Publisher).order_by(Publisher.name).all()
-
-
-from app.schemas.catalog import ReviewCreate, ReviewUpdate  # noqa: E402
