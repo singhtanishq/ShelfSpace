@@ -1,25 +1,37 @@
 """Cart and wishlist endpoints."""
 
+from datetime import datetime
+from typing import List
+
 from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.core.database import get_db
-from app.models import User
-from app.schemas.catalog import BookCard
+from app.models import Book, User, WishlistItem
 from app.schemas.order import (
     CartCouponApply,
     CartItemAdd,
-    CartItemPublic,
     CartItemUpdate,
     CartMergeRequest,
     CartPublic,
     WishlistItemPublic,
 )
 from app.services import cart_service
+from app.utils.exceptions import ConflictError, NotFoundError
 from app.utils.serializers import book_card
 
 router = APIRouter(tags=["cart"])
+
+
+class WishlistAdd(BaseModel):
+    book_id: int = Field(gt=0)
+
+
+# ---------------------------------------------------------------------------
+# Cart
+# ---------------------------------------------------------------------------
 
 
 @router.get("/cart", response_model=CartPublic)
@@ -90,28 +102,55 @@ def merge_cart(
     return cart_service.cart_view(db, user)
 
 
-@router.get("/wishlist", response_model=list[WishlistItemPublic])
+# ---------------------------------------------------------------------------
+# Wishlist
+# ---------------------------------------------------------------------------
+
+
+@router.get("/wishlist", response_model=List[WishlistItemPublic])
 def get_wishlist(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    items = user_wishlist(db, user)
-    return [wishlist_item_view(i) for i in items]
+    items = _wishlist(db, user)
+    return [_wishlist_item_view(i) for i in items]
 
 
-@router.post("/wishlist", status_code=201, response_model=list[WishlistItemPublic])
+@router.post("/wishlist", status_code=201, response_model=List[WishlistItemPublic])
 def add_to_wishlist(
-    data: "WishlistAdd",
+    data: WishlistAdd,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    from app.models import WishlistItem
-    from app.utils.exceptions import ConflictError
+    book = db.get(Book, data.book_id)
+    if book is None or not book.is_active:
+        raise NotFoundError("Book not found.")
+    exists = (
+        db.query(WishlistItem)
+        .filter(WishlistItem.user_id == user.id, WishlistItem.book_id == data.book_id)
+        .first()
+    )
+    if exists is None:
+        db.add(WishlistItem(user_id=user.id, book_id=data.book_id))
+        db.flush()
+    items = _wishlist(db, user)
+    return [_wishlist_item_view(i) for i in items]
 
-    book = db.get("Book", data.book_id) if isinstance(data.book_id, str) else db.get(type("B", (), {}), 0)
-    return []
+
+@router.delete("/wishlist/{book_id}", status_code=204)
+def remove_from_wishlist(
+    book_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    item = (
+        db.query(WishlistItem)
+        .filter(WishlistItem.user_id == user.id, WishlistItem.book_id == book_id)
+        .first()
+    )
+    if item is not None:
+        db.delete(item)
+        db.flush()
 
 
-def user_wishlist(db: Session, user: User):
-    from app.models import WishlistItem
-
+def _wishlist(db: Session, user: User):
     return (
         db.query(WishlistItem)
         .filter(WishlistItem.user_id == user.id)
@@ -120,7 +159,7 @@ def user_wishlist(db: Session, user: User):
     )
 
 
-def wishlist_item_view(item) -> dict:
+def _wishlist_item_view(item: WishlistItem) -> dict:
     book = item.book
     return {
         "book_id": book.id,
