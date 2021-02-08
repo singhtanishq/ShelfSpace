@@ -65,12 +65,10 @@ def admin_get_book(
 
 @router.post("/admin/books", response_model=AdminBook, status_code=201)
 def admin_create_book(
-    data: "BookCreate",
+    data: BookCreate,
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
-    from app.schemas.catalog import BookCreate
-
     book = catalog_service.create_book(db, data, actor=admin)
     return book_detail(book)
 
@@ -78,12 +76,10 @@ def admin_create_book(
 @router.put("/admin/books/{book_id}", response_model=AdminBook)
 def admin_update_book(
     book_id: int,
-    data: "BookUpdate",
+    data: BookUpdate,
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
-    from app.schemas.catalog import BookUpdate
-
     book = catalog_service.update_book(db, book_id, data, actor=admin)
     return book_detail(book)
 
