@@ -187,61 +187,57 @@ def admin_inventory_transactions(
 # ---------------------------------------------------------------------------
 
 
-def _terms_router():
-    return router
-
-
-@router.get("/admin/categories", response_model=list)
+@router.get("/admin/categories", response_model=List[CategoryPublic])
 def admin_categories(db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)):
     return db.query(Category).order_by(Category.name).all()
 
 
-@router.get("/admin/authors", response_model=list)
+@router.get("/admin/authors", response_model=List[AuthorPublic])
 def admin_authors(db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)):
     return db.query(Author).order_by(Author.name).all()
 
 
-@router.get("/admin/publishers", response_model=list)
+@router.get("/admin/publishers", response_model=List[PublisherPublic])
 def admin_publishers(db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)):
     return db.query(Publisher).order_by(Publisher.name).all()
 
 
-@router.post("/admin/categories", status_code=201)
+@router.post("/admin/categories", response_model=CategoryPublic, status_code=201)
 def admin_create_category(
     data: TermCreate, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)
 ):
     return catalog_service.create_term(db, Category, data, actor=admin, entity_name="category")
 
 
-@router.post("/admin/authors", status_code=201)
+@router.post("/admin/authors", response_model=AuthorPublic, status_code=201)
 def admin_create_author(
     data: TermCreate, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)
 ):
     return catalog_service.create_term(db, Author, data, actor=admin, entity_name="author")
 
 
-@router.post("/admin/publishers", status_code=201)
+@router.post("/admin/publishers", response_model=PublisherPublic, status_code=201)
 def admin_create_publisher(
     data: TermCreate, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)
 ):
     return catalog_service.create_term(db, Publisher, data, actor=admin, entity_name="publisher")
 
 
-@router.put("/admin/categories/{term_id}")
+@router.put("/admin/categories/{term_id}", response_model=CategoryPublic)
 def admin_update_category(
     term_id: int, data: TermUpdate, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)
 ):
     return catalog_service.update_term(db, Category, term_id, data, actor=admin, entity_name="category")
 
 
-@router.put("/admin/authors/{term_id}")
+@router.put("/admin/authors/{term_id}", response_model=AuthorPublic)
 def admin_update_author(
     term_id: int, data: TermUpdate, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)
 ):
     return catalog_service.update_term(db, Author, term_id, data, actor=admin, entity_name="author")
 
 
-@router.put("/admin/publishers/{term_id}")
+@router.put("/admin/publishers/{term_id}", response_model=PublisherPublic)
 def admin_update_publisher(
     term_id: int, data: TermUpdate, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)
 ):
