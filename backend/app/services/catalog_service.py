@@ -114,6 +114,10 @@ def get_book_by_slug(db: Session, slug: str, include_inactive: bool = False) -> 
     return book
 
 
+def get_book_by_id(db: Session, book_id: int) -> Book:
+    return _get_book_or_404(db, book_id)
+
+
 def get_related_books(db: Session, book: Book, limit: int = 8) -> Tuple[List[Book], List[Book]]:
     """Books sharing a category, then other books by the same authors."""
     category_ids = [c.id for c in book.categories]
