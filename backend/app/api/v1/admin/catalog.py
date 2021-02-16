@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session, selectinload
 from app.api.deps import get_current_admin_user
 from app.core.database import get_db
 from app.models import Author, Book, Category, Inventory, Publisher, User
-from app.schemas.admin import AuditLogList
 from app.schemas.catalog import (
     AdminBook,
     AuthorPublic,
