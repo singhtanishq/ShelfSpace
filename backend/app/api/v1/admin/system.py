@@ -11,7 +11,7 @@ from app.models import Coupon, User
 from app.schemas.admin import AuditLogList, StoreSettingsPublic, StoreSettingsUpdate
 from app.schemas.catalog import ReviewPublic
 from app.schemas.order import CouponCreate, CouponPublic, CouponUpdate
-from app.services import audit_service, coupon_validation_guard, review_service, settings_service
+from app.services import audit_service, review_service, settings_service
 from app.utils.exceptions import ConflictError, NotFoundError
 from app.utils.pagination import PaginationParams
 from app.utils.serializers import review_public
@@ -36,7 +36,6 @@ def admin_create_coupon(
     data: CouponCreate, db: Session = Depends(get_db), admin: User = Depends(get_current_admin_user)
 ):
     from app.models import CouponDiscountType
-    from datetime import timezone
 
     code = data.code.strip().upper()
     if db.query(Coupon).filter(Coupon.code == code).first() is not None:
