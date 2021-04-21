@@ -1,6 +1,14 @@
 """All ORM models. Importing this package registers every table on Base.metadata."""
 
-from app.models.catalog import Author, Book, BookFormat, Category, Publisher  # noqa: F401
+from app.models.catalog import (  # noqa: F401
+    Author,
+    Book,
+    BookFormat,
+    Category,
+    Publisher,
+    book_authors,
+    book_categories,
+)
 from app.models.cart import Cart, CartItem, Coupon, CouponDiscountType, WishlistItem  # noqa: F401
 from app.models.inventory import Inventory, InventoryChangeType, InventoryTransaction  # noqa: F401
 from app.models.order import (  # noqa: F401
