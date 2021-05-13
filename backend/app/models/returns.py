@@ -64,7 +64,7 @@ class ReturnRequest(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     order: Mapped["Order"] = relationship(back_populates="returns")
-    user: Mapped["User"] = relationship()
+    user: Mapped["User"] = relationship(foreign_keys=[user_id])
     items: Mapped[List["ReturnItem"]] = relationship(
         back_populates="request", cascade="all, delete-orphan"
     )
