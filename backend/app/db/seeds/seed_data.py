@@ -57,7 +57,7 @@ AUTHORS = [
 
 PUBLISHERS = [
     "HarperCollins", "Bloomsbury Publishing", "Penguin Books", "Vintage Classics",
-    "Random House", "Ecco Press", "Picador", "Simon & Schuster",
+    "Random House", "Ecco Press", "Picador", "Simon & Schuster", "Oxford Press",
 ]
 
 # (title, [authors], categories, publisher, year, pages, price, discount, stock, featured, isbn, description)
