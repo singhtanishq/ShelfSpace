@@ -34,6 +34,7 @@ CATEGORIES = [
     ("Mythology", "Ancient tales retold for modern readers"),
     ("Self-Help & Productivity", "Practical guides for work and life"),
     ("History", "Narratives from the past, examined closely"),
+    ("Science", "Popular science and the natural world"),
     ("Biography & Memoir", "Lives worth reading about"),
     ("Poetry", "Verse collections across eras and voices"),
 ]
