@@ -14,7 +14,7 @@ from app.services import analytics_service
 router = APIRouter(tags=["admin-dashboard"])
 
 
-@router.get("/dashboard/summary", response_model=DashboardSummary)
+@router.get("/admin/dashboard/summary", response_model=DashboardSummary)
 def dashboard_summary(
     days: int = Query(default=30, ge=1, le=3650),
     db: Session = Depends(get_db),
@@ -23,7 +23,7 @@ def dashboard_summary(
     return analytics_service.summary(db, days=days)
 
 
-@router.get("/dashboard/charts", response_model=ChartResponse)
+@router.get("/admin/dashboard/charts", response_model=ChartResponse)
 def dashboard_charts(
     days: int = Query(default=30, ge=1, le=3650),
     db: Session = Depends(get_db),
@@ -32,7 +32,7 @@ def dashboard_charts(
     return analytics_service.charts(db, days=days)
 
 
-@router.get("/dashboard/top", response_model=TopEntities)
+@router.get("/admin/dashboard/top", response_model=TopEntities)
 def dashboard_top(
     days: int = Query(default=30, ge=1, le=3650),
     db: Session = Depends(get_db),
@@ -41,7 +41,7 @@ def dashboard_top(
     return analytics_service.top_entities(db, days=days)
 
 
-@router.get("/dashboard/low-stock")
+@router.get("/admin/dashboard/low-stock")
 def dashboard_low_stock(
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
