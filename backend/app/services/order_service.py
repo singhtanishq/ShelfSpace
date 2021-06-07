@@ -6,6 +6,7 @@ payment rows are created and the cart is cleared atomically — overselling and
 half-committed orders are impossible.
 """
 
+import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -116,6 +117,7 @@ def checkout(db: Session, user: User, data: CheckoutRequest) -> Order:
         payment_status = PaymentStatus.PAID
 
     order = Order(
+        order_number=f"tmp-{uuid.uuid4().hex[:12]}",  # provisional; finalized below once id is known
         user_id=user.id,
         status=OrderStatus.PENDING,
         payment_method=method,
@@ -133,6 +135,7 @@ def checkout(db: Session, user: User, data: CheckoutRequest) -> Order:
     db.add(order)
     db.flush()
     order.order_number = f"SS-{datetime.now(timezone.utc):%Y%m%d}-{order.id:05d}"
+    db.flush()
 
     for item in cart.items:
         book = item.book
