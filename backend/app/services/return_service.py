@@ -9,6 +9,7 @@ Business rules (configurable via store settings):
 - Completed replacements issue new copies from stock.
 """
 
+import uuid
 from datetime import datetime, timezone
 from typing import List, Optional
 
@@ -105,6 +106,7 @@ def create_request(db: Session, user: User, order_number: str, data: ReturnCreat
             )
 
     request = ReturnRequest(
+        return_number=f"tmp-{uuid.uuid4().hex[:12]}",  # provisional; finalized below once id is known
         order_id=order.id,
         user_id=user.id,
         type=ReturnType(data.type),
@@ -116,6 +118,7 @@ def create_request(db: Session, user: User, order_number: str, data: ReturnCreat
     db.add(request)
     db.flush()
     request.return_number = f"RT-{request.id:05d}"
+    db.flush()
 
     for entry in data.items:
         db.add(ReturnItem(return_id=request.id, order_item_id=entry.order_item_id, quantity=entry.quantity))
