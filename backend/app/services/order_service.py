@@ -214,6 +214,7 @@ def checkout(db: Session, user: User, data: CheckoutRequest) -> Order:
         body=f"Your order for {len(order.items)} item(s) totalling {total:.2f} has been placed.",
         link=f"/account/orders/{order.order_number}",
     )
+    db.flush()  # populate ids so the caller can serialize the order immediately
     return order
 
 
