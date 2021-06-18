@@ -15,7 +15,7 @@ from app.utils.exceptions import BusinessRuleError, NotFoundError
 from app.utils.pagination import PaginationParams
 from app.utils.serializers import user_admin_public
 
-router = APIRouter(prefix="/admin", tags=["admin-users"])
+router = APIRouter(tags=["admin-users"])
 
 
 @router.get("/admin/users", response_model=List[AdminUserPublic])
