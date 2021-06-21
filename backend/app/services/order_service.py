@@ -30,6 +30,7 @@ from app.models import (
     Payment,
     PaymentMethod,
     PaymentStatus,
+    ReturnRequest,
     User,
 )
 from app.schemas.order import CheckoutRequest
