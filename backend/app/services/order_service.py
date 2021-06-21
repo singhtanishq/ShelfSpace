@@ -231,7 +231,7 @@ def get_order(
         .options(
             selectinload(Order.items),
             selectinload(Order.status_history),
-            selectinload(Order.returns).selectinload("items"),
+            selectinload(Order.returns).selectinload(ReturnRequest.items),
         )
         .filter(Order.order_number == order_number)
         .first()
@@ -254,7 +254,7 @@ def list_orders(
 ) -> tuple:
     query = (
         db.query(Order)
-        .options(selectinload(Order.items), selectinload(Order.returns).selectinload("items"))
+        .options(selectinload(Order.items), selectinload(Order.returns).selectinload(ReturnRequest.items))
         .order_by(Order.placed_at.desc(), Order.id.desc())
     )
     if user is not None:
