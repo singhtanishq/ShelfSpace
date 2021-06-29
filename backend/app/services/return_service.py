@@ -245,10 +245,12 @@ def _complete_request(db: Session, request: ReturnRequest) -> None:
         request.refund_status = RefundStatus.COMPLETED
         remaining = _remaining_quantities(db, order)
         if order.status == OrderStatus.DELIVERED:
+            # Only flip order/payment state when every purchased unit is returned;
+            # partial refunds stay tracked on the return request itself.
             if all(qty <= 0 for qty in remaining.values()):
                 order.status = OrderStatus.RETURNED
-            if order.payment_status == PaymentStatus.PAID:
-                order.payment_status = PaymentStatus.REFUNDED
+                if order.payment_status == PaymentStatus.PAID:
+                    order.payment_status = PaymentStatus.REFUNDED
     else:  # replacement: issue new copies from stock
         for ri in request.items:
             if ri.order_item.book_id is not None:
