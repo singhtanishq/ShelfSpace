@@ -104,7 +104,7 @@ def generate_invoice(db: Session, order: Order, *, user_name: str, user_email: s
             fill = False
         pdf.set_fill_color(245, 247, 250)
         pdf.cell(col_widths[0], 8, str(idx), border=1, align="C", fill=fill)
-        pdf.cell(col_widths[1], 8, _trunc(f"{item.title} — {item.author_names}", 70), border=1, fill=fill)
+        pdf.cell(col_widths[1], 8, _trunc(f"{item.title} - {item.author_names}", 70), border=1, fill=fill)
         pdf.cell(col_widths[2], 8, str(item.quantity), border=1, align="C", fill=fill)
         pdf.cell(col_widths[3], 8, f"{currency} {item.unit_price:,.2f}", border=1, align="R", fill=fill)
         pdf.cell(col_widths[4], 8, f"{currency} {item.line_total:,.2f}", border=1, align="R", fill=fill)
@@ -145,4 +145,4 @@ def generate_invoice(db: Session, order: Order, *, user_name: str, user_email: s
 
 
 def _trunc(text: str, length: int) -> str:
-    return text if len(text) <= length else text[: length - 1] + "…"
+    return text if len(text) <= length else text[: length - 3] + "..."
