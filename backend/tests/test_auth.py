@@ -1,6 +1,8 @@
 """Authentication, authorization and account tests."""
 
 
+from tests.conftest import auth_header  # noqa: F401
+
 class TestRegistration:
     def test_register_success(self, client, db):
         resp = client.post(
