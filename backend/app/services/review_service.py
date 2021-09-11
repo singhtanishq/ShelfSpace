@@ -32,6 +32,8 @@ def create_review(db: Session, user: User, book: Book, data: ReviewCreate) -> Re
     existing = db.query(Review).filter(Review.book_id == book.id, Review.user_id == user.id).first()
     if existing is not None:
         raise ConflictError("You have already reviewed this book. You can edit your existing review.")
+    if not has_verified_purchase(db, user.id, book.id):
+        raise BusinessRuleError("Only readers whose order for this book was delivered can review it.")
 
     review = Review(
         book_id=book.id,
@@ -39,7 +41,7 @@ def create_review(db: Session, user: User, book: Book, data: ReviewCreate) -> Re
         rating=data.rating,
         title=data.title,
         content=data.content,
-        is_verified_purchase=has_verified_purchase(db, user.id, book.id),
+        is_verified_purchase=True,
     )
     db.add(review)
     db.flush()
