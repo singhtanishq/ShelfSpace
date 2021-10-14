@@ -4,24 +4,15 @@ from datetime import datetime, timedelta, timezone
 
 from app.models import Inventory, OrderStatus
 
-from tests.conftest import auth_header  # noqa: F401
+from tests.conftest import auth_header, checkout, mark_delivered  # noqa: F401
 
 API = "/api/v1"
 
 
 def _deliver_order(client, db, customer_header, admin_header, book, qty=2):
-    client.post(f"{API}/cart/items", headers=customer_header, json={"book_id": book.id, "quantity": qty})
-    resp = client.post(
-        f"{API}/orders/checkout",
-        headers=customer_header,
-        json={
-            "shipping_address": {"full_name": "Jane Doe", "phone": "+91 9876543210", "line1": "42 Test Lane", "city": "Mumbai", "state": "Maharashtra", "postal_code": "400001", "country": "India"},
-            "payment_method": "cod",
-        },
-    )
-    order = resp.json()
+    order = checkout(client, customer_header, book.id, qty=qty)
     number = order["order_number"]
-    client.put(f"{API}/admin/orders/{number}/status", headers=admin_header, json={"status": "delivered"})
+    mark_delivered(client, admin_header, number)
     detail = client.get(f"{API}/orders/{number}", headers=customer_header).json()
     return detail, order["items"][0]["id"]
 
@@ -38,16 +29,7 @@ class TestReturnEligibility:
     def test_pending_order_not_eligible(self, client, db, customer, admin, book):
         ch = auth_header(client, db, customer)
         ah = auth_header(client, db, admin)
-        client.post(f"{API}/cart/items", headers=ch, json={"book_id": book.id, "quantity": 1})
-        resp = client.post(
-            f"{API}/orders/checkout",
-            headers=ch,
-            json={
-                "shipping_address": {"full_name": "Jane Doe", "phone": "+91 9876543210", "line1": "42 Test Lane", "city": "Mumbai", "state": "Maharashtra", "postal_code": "400001", "country": "India"},
-                "payment_method": "cod",
-            },
-        )
-        order = resp.json()
+        order = checkout(client, ch, book.id)
         item_id = order["items"][0]["id"]
         resp = _request_return(client, ch, order["order_number"], item_id)
         assert resp.status_code == 422

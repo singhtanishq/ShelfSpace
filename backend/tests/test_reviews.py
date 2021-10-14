@@ -1,22 +1,13 @@
 """Reviews: verified purchases, duplicate prevention, rating aggregates, moderation."""
 
-from tests.conftest import auth_header  # noqa: F401
+from tests.conftest import auth_header, checkout, mark_delivered  # noqa: F401
 
 API = "/api/v1"
 
 
 def _purchase_and_deliver(client, db, ch, ah, book):
-    client.post(f"{API}/cart/items", headers=ch, json={"book_id": book.id, "quantity": 1})
-    resp = client.post(
-        f"{API}/orders/checkout",
-        headers=ch,
-        json={
-            "shipping_address": {"full_name": "Jane Doe", "phone": "+91 9876543210", "line1": "42 Test Lane", "city": "Mumbai", "state": "Maharashtra", "postal_code": "400001", "country": "India"},
-            "payment_method": "cod",
-        },
-    )
-    order = resp.json()
-    client.put(f"{API}/admin/orders/{order['order_number']}/status", headers=ah, json={"status": "delivered"})
+    order = checkout(client, ch, book.id)
+    mark_delivered(client, ah, order["order_number"])
     return order
 
 
