@@ -31,6 +31,16 @@ from app.models import (
 TEST_DB_URL = "sqlite://"
 
 
+@pytest.fixture(autouse=True)
+def _reset_rate_limiter():
+    """The limiter is process-global; keep buckets clean between tests."""
+    from app.utils import rate_limit
+
+    rate_limit._buckets.clear()
+    yield
+    rate_limit._buckets.clear()
+
+
 @pytest.fixture()
 def db_engine():
     engine = create_engine(
