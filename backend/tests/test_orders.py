@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 from app.models import Inventory, Order, OrderStatus
 
-from tests.conftest import auth_header  # noqa: F401
+from tests.conftest import auth_header, checkout, mark_delivered  # noqa: F401
 
 API = "/api/v1"
 
@@ -63,23 +63,22 @@ class TestOrderStateMachine:
         ah = auth_header(client, db, admin)
         order = _checkout(client, ch, book.id)
         number = order["order_number"]
-        for status in ("confirmed", "delivered"):
-            client.put(f"{API}/admin/orders/{number}/status", headers=ah, json={"status": status})
+        mark_delivered(client, ah, number)
         resp = client.put(f"{API}/admin/orders/{number}/status", headers=ah, json={"status": "processing"})
         assert resp.status_code == 422
 
     def test_cancel_restocks_inventory(self, client, db, customer, book):
         ch = auth_header(client, db, customer)
+        initial = book.inventory.stock_quantity
         order = _checkout(client, ch, book.id, qty=2)
         db.refresh(book.inventory)
-        after_sale = book.inventory.stock_quantity
-        assert after_sale == book.stock_quantity - 2
+        assert book.inventory.stock_quantity == initial - 2
 
         resp = client.post(f"{API}/orders/{order['order_number']}/cancel", headers=ch, json={"note": "changed mind"})
         assert resp.status_code == 200
         assert resp.json()["status"] == "cancelled"
         db.refresh(book.inventory)
-        assert book.inventory.stock_quantity == book.stock_quantity
+        assert book.inventory.stock_quantity == initial
 
     def test_cancel_after_delivered_rejected(self, client, db, customer, admin, book):
         ch = auth_header(client, db, customer)

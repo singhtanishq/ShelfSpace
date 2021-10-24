@@ -1,6 +1,8 @@
 """Admin platform: dashboard, inventory, book CRUD, users, coupons, settings, audit."""
 
 
+from tests.conftest import auth_header, make_coupon  # noqa: F401
+
 class TestDashboard:
     def test_summary_metrics(self, client, db, admin):
         header = auth_header(client, db, admin)
