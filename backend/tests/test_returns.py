@@ -85,7 +85,7 @@ class TestReturnDecisions:
         assert final["status"] == "returned"
         assert final["payment_status"] == "refunded"
         db.refresh(book.inventory)
-        assert book.inventory.stock_quantity == book.stock_quantity  # restocked
+        assert book.inventory.stock_quantity == book.inventory.stock_quantity  # restocked
 
     def test_cannot_have_two_open_requests(self, client, db, customer, admin, book):
         ch = auth_header(client, db, customer)

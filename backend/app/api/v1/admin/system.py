@@ -41,9 +41,9 @@ def admin_create_coupon(
     if db.query(Coupon).filter(Coupon.code == code).first() is not None:
         raise ConflictError("A coupon with this code already exists.")
     if data.discount_type == "percent" and data.value > 100:
-        from app.utils.exceptions import ValidationError
+        from app.utils.exceptions import BusinessRuleError
 
-        raise ValidationError("Percentage discounts cannot exceed 100.")
+        raise BusinessRuleError("Percentage discounts cannot exceed 100.")
     coupon = Coupon(
         code=code,
         description=data.description,
