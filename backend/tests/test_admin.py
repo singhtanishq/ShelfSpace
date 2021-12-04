@@ -99,15 +99,15 @@ class TestInventoryAdmin:
             f"/api/v1/admin/inventory/{book.id}/adjust", headers=header, json={"change": 5, "note": "restock"}
         )
         assert resp.status_code == 200
-        assert resp.json()["stock_quantity"] == book.stock_quantity + 5
+        assert resp.json()["stock_quantity"] == book.inventory.stock_quantity + 5
         txs = client.get(f"/api/v1/admin/inventory/{book.id}/transactions", headers=header).json()
         assert txs[0]["change"] == 5
-        assert txs[0]["balance_after"] == book.stock_quantity + 5
+        assert txs[0]["balance_after"] == book.inventory.stock_quantity + 5
 
     def test_negative_adjust_beyond_stock_rejected(self, client, db, admin, book):
         header = auth_header(client, db, admin)
         resp = client.post(
-            f"/api/v1/admin/inventory/{book.id}/adjust", headers=header, json={"change": -(book.stock_quantity + 1)}
+            f"/api/v1/admin/inventory/{book.id}/adjust", headers=header, json={"change": -(book.inventory.stock_quantity + 1)}
         )
         assert resp.status_code == 422
 
