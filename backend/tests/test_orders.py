@@ -85,29 +85,15 @@ class TestOrderStateMachine:
         ah = auth_header(client, db, admin)
         order = _checkout(client, ch, book.id)
         number = order["order_number"]
-        client.put(f"{API}/admin/orders/{number}/status", headers=ah, json={"status": "delivered"})
+        mark_delivered(client, ah, number)
         resp = client.post(f"{API}/orders/{number}/cancel", headers=ch, json={})
         assert resp.status_code == 422
 
     def test_paid_order_cancel_marks_refund(self, client, db, customer, book):
         ch = auth_header(client, db, customer)
-        order = _checkout(client, ch, book.id, payment="upi")  # mock gateway lacks upi without id? card path validated
-        # use card to be paid
-        ch2 = auth_header(client, db, customer)
-        client.delete(f"{API}/cart", headers=ch2)
-        resp = None
-        client.post(f"{API}/cart/items", headers=ch2, json={"book_id": book.id, "quantity": 1})
-        resp = client.post(
-            f"{API}/orders/checkout",
-            headers=ch2,
-            json={
-                "shipping_address": {"full_name": "Jane Doe", "phone": "+91 9876543210", "line1": "42 Test Lane", "city": "Mumbai", "state": "Maharashtra", "postal_code": "400001", "country": "India"},
-                "payment_method": "card",
-                "card_number": "4242424242424242",
-            },
-        )
-        paid = resp.json()
-        cancel = client.post(f"{API}/orders/{paid['order_number']}/cancel", headers=ch2, json={})
+        paid = _checkout(client, ch, book.id, payment="card", card_number="4242424242424242")
+        assert paid["payment_status"] == "paid"
+        cancel = client.post(f"{API}/orders/{paid['order_number']}/cancel", headers=ch, json={})
         assert cancel.status_code == 200
         assert cancel.json()["payment_status"] == "refunded"
 

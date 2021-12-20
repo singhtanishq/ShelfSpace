@@ -83,6 +83,7 @@ class TestCheckout:
 
     def test_checkout_creates_order_and_decrements_stock(self, client, db, customer, book):
         header = auth_header(client, db, customer)
+        initial = book.inventory.stock_quantity
         _add_to_cart(client, header, book.id, 3)
         resp = self._checkout(client, header, payment="cod")
         assert resp.status_code == 201, resp.text
@@ -91,7 +92,7 @@ class TestCheckout:
         assert order["payment_status"] == "pending"  # COD
         assert order["items"][0]["quantity"] == 3
         db.refresh(book.inventory)
-        assert book.inventory.stock_quantity == book.inventory.stock_quantity - 3
+        assert book.inventory.stock_quantity == initial - 3
 
     def test_mock_card_payment_is_paid(self, client, db, customer, book):
         header = auth_header(client, db, customer)
@@ -120,6 +121,9 @@ class TestCheckout:
 
     def test_oversell_prevented_across_sessions(self, client, db, customer, admin, book):
         """Two users race for the same units; stock 3, both try to buy 3."""
+        initial = book.inventory.stock_quantity
+        book.inventory.stock_quantity = 3
+        db.flush()
         h1 = auth_header(client, db, customer)
         h2 = auth_header(client, db, admin)
         _add_to_cart(client, h1, book.id, 3)
@@ -130,6 +134,8 @@ class TestCheckout:
         r2 = self._checkout(client, h2, payment="cod")
         assert r2.status_code == 422
         assert "available" in r2.json()["error"]["message"].lower()
+        book.inventory.stock_quantity = initial
+        db.flush()
 
     def test_checkout_with_empty_cart_fails(self, client, db, customer):
         header = auth_header(client, db, customer)
