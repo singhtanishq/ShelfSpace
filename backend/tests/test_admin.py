@@ -1,7 +1,7 @@
 """Admin platform: dashboard, inventory, book CRUD, users, coupons, settings, audit."""
 
 
-from tests.conftest import auth_header, make_coupon  # noqa: F401
+from tests.conftest import auth_header, checkout, make_coupon  # noqa: F401
 
 class TestDashboard:
     def test_summary_metrics(self, client, db, admin):
@@ -50,15 +50,7 @@ class TestBookAdmin:
     def test_archive_protects_order_history(self, client, db, customer, admin, book):
         ch = auth_header(client, db, customer)
         ah = auth_header(client, db, admin)
-        client.post(f"/api/v1/cart/items", headers=ch, json={"book_id": book.id, "quantity": 1})
-        order = client.post(
-            f"/api/v1/orders/checkout",
-            headers=ch,
-            json={
-                "shipping_address": {"full_name": "J", "phone": "+91 9876543210", "line1": "1 St", "city": "X", "state": "Y", "postal_code": "1", "country": "India"},
-                "payment_method": "cod",
-            },
-        ).json()
+        order = checkout(client, ch, book.id)
 
         hard = client.delete(f"/api/v1/admin/books/{book.id}?hard=true", headers=ah)
         assert hard.status_code == 422
@@ -95,14 +87,15 @@ class TestBookAdmin:
 class TestInventoryAdmin:
     def test_adjust_stock_creates_ledger_entry(self, client, db, admin, book):
         header = auth_header(client, db, admin)
+        initial = book.inventory.stock_quantity
         resp = client.post(
             f"/api/v1/admin/inventory/{book.id}/adjust", headers=header, json={"change": 5, "note": "restock"}
         )
         assert resp.status_code == 200
-        assert resp.json()["stock_quantity"] == book.inventory.stock_quantity + 5
+        assert resp.json()["stock_quantity"] == initial + 5
         txs = client.get(f"/api/v1/admin/inventory/{book.id}/transactions", headers=header).json()
         assert txs[0]["change"] == 5
-        assert txs[0]["balance_after"] == book.inventory.stock_quantity + 5
+        assert txs[0]["balance_after"] == initial + 5
 
     def test_negative_adjust_beyond_stock_rejected(self, client, db, admin, book):
         header = auth_header(client, db, admin)
@@ -121,7 +114,9 @@ class TestTaxonomyAdmin:
         updated = client.put(f"/api/v1/admin/categories/{term_id}", headers=header, json={"name": "Modern Poetry"})
         assert updated.json()["name"] == "Modern Poetry"
         # in use by `book` → delete must be blocked
-        book.categories.append(updated.json())
+        from app.models import Category
+
+        book.categories.append(db.get(Category, term_id))
         db.flush()
         blocked = client.delete(f"/api/v1/admin/categories/{term_id}", headers=header)
         assert blocked.status_code == 422
@@ -143,15 +138,7 @@ class TestUserAdmin:
     def test_hard_delete_blocked_with_orders(self, client, db, customer, admin, book):
         ch = auth_header(client, db, customer)
         ah = auth_header(client, db, admin)
-        client.post(f"/api/v1/cart/items", headers=ch, json={"book_id": book.id, "quantity": 1})
-        client.post(
-            f"/api/v1/orders/checkout",
-            headers=ch,
-            json={
-                "shipping_address": {"full_name": "J", "phone": "+91 9876543210", "line1": "1 St", "city": "X", "state": "Y", "postal_code": "1", "country": "India"},
-                "payment_method": "cod",
-            },
-        )
+        checkout(client, ch, book.id)
         resp = client.delete(f"/api/v1/admin/users/{customer.id}?hard=true", headers=ah)
         assert resp.status_code == 422
 
@@ -207,15 +194,7 @@ class TestSettingsAndAudit:
     def test_notifications_flow(self, client, db, customer, admin, book):
         ch = auth_header(client, db, customer)
         ah = auth_header(client, db, admin)
-        client.post(f"/api/v1/cart/items", headers=ch, json={"book_id": book.id, "quantity": 1})
-        client.post(
-            f"/api/v1/orders/checkout",
-            headers=ch,
-            json={
-                "shipping_address": {"full_name": "J", "phone": "+91 9876543210", "line1": "1 St", "city": "X", "state": "Y", "postal_code": "1", "country": "India"},
-                "payment_method": "cod",
-            },
-        )
+        checkout(client, ch, book.id)
         resp = client.get("/api/v1/notifications", headers=ch).json()
         assert resp["total"] >= 1
         assert resp["unread_count"] >= 1
