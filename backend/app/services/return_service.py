@@ -107,8 +107,8 @@ def create_request(db: Session, user: User, order_number: str, data: ReturnCreat
 
     request = ReturnRequest(
         return_number=f"tmp-{uuid.uuid4().hex[:12]}",  # provisional; finalized below once id is known
-        order_id=order.id,
-        user_id=user.id,
+        order=order,  # assign via relationship so order.returns stays consistent in-session
+        user=user,
         type=ReturnType(data.type),
         status=ReturnStatus.REQUESTED,
         reason=ReturnReason(data.reason),
