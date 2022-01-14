@@ -1,6 +1,6 @@
 """Cart management: server-backed cart per user with stock-aware totals."""
 
-from typing import List, Optional
+from typing import List
 
 from sqlalchemy.orm import Session, selectinload
 

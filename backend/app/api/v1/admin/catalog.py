@@ -1,6 +1,6 @@
 """Admin: book management, cover uploads, inventory and taxonomy management."""
 
-from typing import List, Optional
+from typing import List
 
 from fastapi import APIRouter, Depends, File, Query, UploadFile
 from sqlalchemy.orm import Session, selectinload

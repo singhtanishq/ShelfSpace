@@ -1,7 +1,7 @@
 """Coupon validation and discount computation."""
 
 from datetime import datetime, timezone
-from typing import Optional, Tuple
+from typing import Tuple
 
 from sqlalchemy.orm import Session
 

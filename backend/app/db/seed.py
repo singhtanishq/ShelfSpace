@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 
 from app.core.database import SessionLocal, media_path, create_engine  # noqa
 from app.core.logging import get_logger
-from app.core.security import hash_password, hash_token
+from app.core.security import hash_password
 from app.models import (
     Address,
     Author,
@@ -24,7 +24,6 @@ from app.models import (
     OrderItem,
     OrderStatus,
     OrderStatusHistory,
-    Notification,
     Payment,
     PaymentMethod,
     PaymentStatus,
@@ -32,8 +31,6 @@ from app.models import (
     Review,
     User,
     UserRole,
-    book_authors,
-    book_categories,
 )
 from app.db.seeds.seed_data import (
     ADDRESSES,

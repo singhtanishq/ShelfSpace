@@ -3,9 +3,9 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_optional_user
+from app.api.deps import get_current_user
 from app.core.database import get_db
-from app.models import Author, Book, Category, Publisher, User
+from app.models import Author, Category, Publisher, User
 from app.schemas.catalog import (
     AuthorPublic,
     BookDetail,
@@ -21,7 +21,7 @@ from app.schemas.catalog import (
     ReviewUpdate,
 )
 from app.services import catalog_service, review_service
-from app.utils.pagination import PaginationParams, Page
+from app.utils.pagination import PaginationParams
 from app.utils.serializers import book_card, book_detail, review_public
 
 router = APIRouter(tags=["catalog"])

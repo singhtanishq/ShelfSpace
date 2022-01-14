@@ -1,9 +1,8 @@
 """Customer order endpoints: checkout, tracking, cancellation, invoices, returns."""
 
-from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List
 
-from fastapi import APIRouter, Depends, Query, Response
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
@@ -19,7 +18,6 @@ from app.schemas.order import (
     ReturnRequestPublic,
 )
 from app.services import invoice_service, order_service, return_service
-from app.utils.exceptions import NotFoundError
 from app.utils.pagination import PaginationParams
 from app.utils.serializers import order_public, return_public
 

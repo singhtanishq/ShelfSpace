@@ -3,7 +3,7 @@
 Falls back to .env defaults when a key has not been configured yet.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from sqlalchemy.orm import Session
 

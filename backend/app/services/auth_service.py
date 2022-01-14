@@ -3,7 +3,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Tuple
 
-import jwt as pyjwt
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
