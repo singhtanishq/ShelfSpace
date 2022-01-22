@@ -37,7 +37,6 @@ def admin_list_users(
         query = query.filter(User.role == UserRole(role))
     if is_active is not None:
         query = query.filter(User.is_active == is_active)
-    total = query.count()
     users = (
         query.order_by(User.created_at.desc())
         .offset(pagination.offset())

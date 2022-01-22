@@ -14,7 +14,7 @@ def _purchase_and_deliver(client, db, ch, ah, book):
 class TestReviews:
     def test_review_requires_purchase(self, client, db, customer, admin, book):
         ch = auth_header(client, db, customer)
-        ah = auth_header(client, db, admin)
+        auth_header(client, db, admin)
         resp = client.post(
             f"{API}/books/{book.slug}/reviews", headers=ch, json={"rating": 5, "content": "Great!"}
         )
