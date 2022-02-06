@@ -27,7 +27,6 @@ def _request_return(client, customer_header, order_number, item_id, qty=1, rtype
 class TestReturnEligibility:
     def test_pending_order_not_eligible(self, client, db, customer, admin, book):
         ch = auth_header(client, db, customer)
-        ah0 = auth_header(client, db, admin)
         order = checkout(client, ch, book.id)
         item_id = order["items"][0]["id"]
         resp = _request_return(client, ch, order["order_number"], item_id)
