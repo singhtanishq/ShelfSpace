@@ -56,7 +56,7 @@ def delete_address(
 # ---------------------------------------------------------------------------
 
 
-@router.get("/reviews", response_model=list)
+@router.get("/reviews")
 def my_reviews(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     reviews = review_service.list_reviews_by_user(db, user)
     return [review_public(r) for r in reviews]
