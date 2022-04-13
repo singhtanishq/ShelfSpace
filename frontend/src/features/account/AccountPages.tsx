@@ -182,7 +182,7 @@ export function OrdersPage() {
 const STATUS_STEPS = ["pending", "confirmed", "processing", "shipped", "out_for_delivery", "delivered"] as const;
 
 export function OrderDetailPage({ adminMode = false }: { adminMode?: boolean }) {
-  const { orderNumber = "" } = adminMode ? { orderNumber: window.location.pathname.split("/").pop() ?? "" } : useParams();
+  const { orderNumber = "" } = useParams();
   const queryClient = useQueryClient();
   const [cancelOpen, setCancelOpen] = useState(false);
   const [returnModal, setReturnModal] = useState(false);
