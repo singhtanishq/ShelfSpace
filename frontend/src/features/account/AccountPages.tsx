@@ -226,7 +226,7 @@ export function OrderDetailPage({ adminMode = false }: { adminMode?: boolean }) 
       )}
 
       {/* Success banner */}
-      {(window.history.state?.usr as any)?.justOrdered && !adminMode && (
+      {justOrdered && !adminMode && (
         <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 animate-fade-in-up">
           <CheckCircle2 className="h-5 w-5" aria-hidden />
           Thank you! Your order has been placed. A confirmation email is on its way.
@@ -282,10 +282,10 @@ export function OrderDetailPage({ adminMode = false }: { adminMode?: boolean }) 
         {/* Items */}
         <Card>
           <CardHeader title="Items" action={
-            !adminMode && order.payment_status !== "refunded" ? (
-              <a href={`/api/v1/orders/${order.order_number}/invoice`} target="_blank" rel="noreferrer">
-                <Button variant="outline" size="sm"><FileDown className="h-4 w-4" aria-hidden /> Invoice</Button>
-              </a>
+            !adminMode ? (
+              <Button variant="outline" size="sm" onClick={downloadInvoice}>
+                <FileDown className="h-4 w-4" aria-hidden /> Invoice
+              </Button>
             ) : undefined
           } />
           <CardBody className="space-y-4">
