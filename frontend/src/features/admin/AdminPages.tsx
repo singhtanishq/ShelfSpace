@@ -1,9 +1,12 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import {
-  IndianRupee, ShoppingCart, Users, BookOpen, Boxes, RefreshCcw, TrendingUp, AlertTriangle,
-} from "lucide-react";
+import {} from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { Field } from "@/components/ui/Input";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend,
 } from "recharts";
@@ -257,7 +260,7 @@ export function AdminBooksPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-books"] });
       queryClient.invalidateQueries({ queryKey: ["books"] });
-      toast(editId ? "Book updated" : "Book created", { type: "success" });
+      editId ? toast.success("Book updated") : toast.success("Book created");
       setModal(false);
       setCoverFile(null);
     },
@@ -388,7 +391,6 @@ export function AdminBooksPage() {
 }
 
 function ConfirmArchiving(props: { open: boolean; onClose: () => void; onConfirm: () => void; loading: boolean }) {
-  const { ConfirmDialog } = require("@/components/ui/ConfirmDialog");
   return (
     <ConfirmDialog
       {...props}
@@ -404,7 +406,7 @@ function BookForm({
   open, onClose, form, setForm, authors, categories, publishers, isEdit, valid, saving, onSubmit, coverFile, setCoverFile,
 }: any) {
   return (
-    <Modal2 open={open} onClose={onClose} title={isEdit ? "Edit book" : "Add book"} size="lg">
+    <Modal open={open} onClose={onClose} title={isEdit ? "Edit book" : "Add book"} size="lg">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <Field label="Title" required>
@@ -493,7 +495,7 @@ function BookForm({
         <Button variant="ghost" onClick={onClose} type="button">Cancel</Button>
         <Button onClick={onSubmit} loading={saving} disabled={!valid} type="button">{isEdit ? "Save changes" : "Create book"}</Button>
       </div>
-    </Modal2>
+    </Modal>
   );
 }
 
@@ -521,9 +523,3 @@ function MultiCheck({ options, selected, onChange }: { options: { id: number; na
     </div>
   );
 }
-
-import { Modal as Modal2 } from "@/components/ui/Modal";
-import { Field } from "@/components/ui/Input";
-import { toast } from "sonner";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { Button } from "@/components/ui/Button";
