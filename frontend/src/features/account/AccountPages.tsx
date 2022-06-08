@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
-import { Package, MapPin, KeyRound, ClipboardList, Heart, Bell, User as UserIcon, FileDown, RotateCcw, XCircle, Star, Trash2, Plus, Pencil, LogIn } from "lucide-react";
+import { Link, NavLink, Outlet, useLocation, useParams } from "react-router-dom";
+import { Package, MapPin, KeyRound, ClipboardList, Heart, Bell, User as UserIcon, FileDown, RotateCcw, XCircle, Star, Trash2, Plus, Pencil, LogIn , CheckCircle2}
 import { toast } from "sonner";
 import { addressApi, authApi, cartApi, notificationsApi, ordersApi, wishlistApi, accountApi, catalogApi } from "@/api/endpoints";
 import { useAuthStore } from "@/stores/auth";
@@ -302,7 +302,7 @@ export function OrderDetailPage({ adminMode = false }: { adminMode?: boolean }) 
                     </p>
                     {returnedQty >= item.quantity && <p className="text-xs font-medium text-brand-400">Fully returned</p>}
                     {item.book_id && ["delivered", "returned"].includes(order.status) && (
-                      <Link to={`/books/${item.slug}`} className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:text-brand-800">
+                      <Link to={`/books?q=${encodeURIComponent(item.title)}`} className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:text-brand-800">
                         <Star className="h-3 w-3" aria-hidden /> Rate & review
                       </Link>
                     )}
