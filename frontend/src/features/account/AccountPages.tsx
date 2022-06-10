@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, NavLink, Outlet, useLocation, useParams } from "react-router-dom";
-import { Package, MapPin, KeyRound, ClipboardList, Heart, Bell, User as UserIcon, FileDown, RotateCcw, XCircle, Star, Trash2, Plus, Pencil, LogIn , CheckCircle2}
+import { Package, MapPin, KeyRound, ClipboardList, Heart, Bell, User as UserIcon, FileDown, RotateCcw, XCircle, Star, Trash2, Plus, Pencil, LogIn, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { addressApi, authApi, cartApi, notificationsApi, ordersApi, wishlistApi, accountApi, catalogApi } from "@/api/endpoints";
 import { useAuthStore } from "@/stores/auth";
