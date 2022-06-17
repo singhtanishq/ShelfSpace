@@ -7,7 +7,7 @@ import { PageLoader } from "@/components/ui/states";
 
 /** Blocks rendering until the session has been validated against the API. */
 export function RequireAuth() {
-  const { accessToken, user, setUser, clearSession, hydrated } = useAuthStore();
+  const { accessToken, user, setUser, clearSession } = useAuthStore();
   const location = useLocation();
 
   // Validate the token once per mount; the interceptor refreshes on 401.
