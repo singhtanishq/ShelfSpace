@@ -52,10 +52,12 @@ export function CheckoutPage() {
     [addresses]
   );
 
-  // Preselect the default address once addresses load.
+  // Preselect the default address once addresses load (skip while a modal edit is in flight).
+  const preselected = useAddressesPreselected();
   useEffect(() => {
-    if (defaultAddress && selectedAddressId === "new" && addresses && addresses.length > 0 && selectedAddressId !== "new") {
+    if (defaultAddress && addresses && addresses.length > 0 && selectedAddressId === "new" && !preselected) {
       setSelectedAddressId(defaultAddress.id);
+      setAddressesPreselected();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addresses]);
