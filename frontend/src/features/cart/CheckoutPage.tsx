@@ -32,7 +32,7 @@ const EMPTY_FORM = {
 export function CheckoutPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [selectedAddressId, setSelectedAddressId] = useState<number | "new">("new");
+  const [selectedAddressId, setSelectedAddressId] = useState<number | "new" | null>(null);
   const [payment, setPayment] = useState<"cod" | "card" | "upi">("cod");
   const [cardNumber, setCardNumber] = useState("");
   const [upiId, setUpiId] = useState("");
@@ -52,12 +52,10 @@ export function CheckoutPage() {
     [addresses]
   );
 
-  // Preselect the default address once addresses load (skip while a modal edit is in flight).
-  const preselected = useAddressesPreselected();
+  // Preselect the default address once addresses load.
   useEffect(() => {
-    if (defaultAddress && addresses && addresses.length > 0 && selectedAddressId === "new" && !preselected) {
+    if (selectedAddressId === null && defaultAddress) {
       setSelectedAddressId(defaultAddress.id);
-      setAddressesPreselected();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addresses]);
@@ -83,7 +81,7 @@ export function CheckoutPage() {
       };
       if (selectedAddressId === "new") {
         payload.shipping_address = form;
-      } else {
+      } else if (typeof selectedAddressId === "number") {
         payload.address_id = selectedAddressId;
       }
       if (payment === "card") payload.card_number = cardNumber;
@@ -115,7 +113,8 @@ export function CheckoutPage() {
 
   const canPlace =
     cart.items.every((i) => i.in_stock) &&
-    (selectedAddressId !== "new" || addressFormValid) &&
+    (typeof selectedAddressId === "number" ||
+      (selectedAddressId === "new" && addressFormValid)) &&
     (payment !== "card" || cardNumber.replace(/\s/g, "").length >= 12) &&
     (payment !== "upi" || upiId.includes("@")) &&
     !placeOrder.isPending;
