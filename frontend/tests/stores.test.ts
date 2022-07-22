@@ -58,7 +58,7 @@ describe("utils", () => {
   });
 
   it("formats dates readably", () => {
-    expect(formatDate("2026-09-14T10:00:00Z")).toMatch(/14 Sep 2026|13 Sep 2026/); // timezone-dependent
+    expect(formatDate("2026-09-14T10:00:00Z")).toMatch(/1[34] Sept 2026/); // timezone-dependent
     expect(formatDate(null)).toBe("—");
   });
 
