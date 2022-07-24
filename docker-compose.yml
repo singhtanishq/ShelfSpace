@@ -1,0 +1,49 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: shelfspace-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-shelfspace}
+      MYSQL_DATABASE: book_shop
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:-shelfspace}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build: ./backend
+    container_name: shelfspace-api
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      ENVIRONMENT: development
+      DEBUG: "true"
+      DATABASE_URL: mysql+pymysql://root:${MYSQL_ROOT_PASSWORD:-shelfspace}@mysql:3306/book_shop
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-change-me}
+      CORS_ORIGINS: http://localhost:5173,http://localhost:8080
+      FRONTEND_URL: http://localhost:5173
+      EMAIL_ENABLED: "false"
+      EMAIL_WORKER_ENABLED: "true"
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "alembic upgrade head &&
+             python -m app.db.seed &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  frontend:
+    build: ./frontend
+    container_name: shelfspace-web
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  mysql-data:
