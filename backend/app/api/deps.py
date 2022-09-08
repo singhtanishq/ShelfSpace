@@ -47,19 +47,6 @@ def get_current_user(
     return user
 
 
-def get_optional_user(
-    request: Request,
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(bearer_scheme),
-    db: Session = Depends(get_db),
-) -> Optional[User]:
-    """Like get_current_user but returns None for anonymous visitors."""
-    if credentials is None:
-        return None
-    try:
-        return get_current_user(request, credentials, db)
-    except AuthErrors:
-        return None
-
 
 def get_current_admin_user(user: User = Depends(get_current_user)) -> User:
     if user.role != UserRole.ADMIN:

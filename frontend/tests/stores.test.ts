@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { useGuestCart } from "@/stores/guestCart";
 import { useAuthStore } from "@/stores/auth";
-import { formatCurrency, formatDate, mediaUrl, truncate } from "@/utils";
+import { formatCurrency, formatDate, mediaUrl } from "@/utils";
 
 describe("guestCart store", () => {
   beforeEach(() => {
@@ -66,10 +66,5 @@ describe("utils", () => {
     expect(mediaUrl("media/covers/x.svg")).toBe("/media/covers/x.svg");
     expect(mediaUrl("https://cdn.example.com/x.png")).toBe("https://cdn.example.com/x.png");
     expect(mediaUrl(null)).toBeUndefined();
-  });
-
-  it("truncates long text", () => {
-    expect(truncate("short", 10)).toBe("short");
-    expect(truncate("a very long title indeed", 12)).toMatch(/…$/);
   });
 });

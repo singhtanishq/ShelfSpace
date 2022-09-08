@@ -67,10 +67,6 @@ class Settings(BaseSettings):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value
 
-    @property
-    def is_production(self) -> bool:
-        return self.ENVIRONMENT == "production"
-
     def ensure_media_dirs(self) -> None:
         """Create media sub-directories if missing."""
         import os
