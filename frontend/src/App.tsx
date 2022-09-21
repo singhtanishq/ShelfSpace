@@ -3,7 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PublicLayout } from "@/layouts/PublicLayout";
-import { RequireAuth, RequireAdmin, GuestOnly } from "@/layouts/guards";
+import { RequireAuth, RequireAdmin, GuestOnly, SessionRestore } from "@/layouts/guards";
 import { PageLoader } from "@/components/ui/states";
 import { hydrateAuth } from "@/stores/auth";
 
@@ -138,6 +138,7 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <SessionRestore />
       <RouterProvider router={router} />
       <Toaster position="top-center" richColors closeButton />
     </QueryClientProvider>
