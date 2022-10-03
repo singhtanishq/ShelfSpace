@@ -192,7 +192,7 @@ export const adminApi = {
   decideReturn: (id: number, decision: "approve" | "reject" | "complete", note?: string) =>
     api.put(`/admin/returns/${id}/${decision}`, { note }),
 
-  users: (params: Record<string, unknown>) => api.get<Paginated<AdminUser>>("/admin/users", { params }),
+  users: (params: Record<string, unknown>) => api.get<AdminUser[]>("/admin/users", { params }),
   user: (id: number) => api.get<AdminUser>(`/admin/users/${id}`),
   updateUser: (id: number, data: Record<string, unknown>) => api.put<AdminUser>(`/admin/users/${id}`, data),
   deleteUser: (id: number, hard = false) => api.delete(`/admin/users/${id}`, { params: { hard } }),
