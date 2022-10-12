@@ -85,7 +85,7 @@ export function BookCard({ book }: { book: Book }) {
         )}
         <button
           onClick={onWishlist}
-          className="absolute right-2 top-2 rounded-full bg-white/90 p-2 text-brand-500 opacity-0 shadow-sm transition-opacity hover:text-red-500 focus:opacity-100 group-hover:opacity-100"
+          className="absolute right-2 top-2 rounded-full bg-white/90 p-2 text-brand-500 shadow-sm transition-opacity hover:text-red-500 focus:opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
           aria-label={`Save ${book.title} to wishlist`}
         >
           <Heart className="h-4 w-4" />
