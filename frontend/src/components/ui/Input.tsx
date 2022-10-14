@@ -1,4 +1,13 @@
-import { forwardRef, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
+import {
+  cloneElement,
+  forwardRef,
+  isValidElement,
+  useId,
+  type InputHTMLAttributes,
+  type ReactNode,
+  type SelectHTMLAttributes,
+  type TextareaHTMLAttributes,
+} from "react";
 import { cn } from "@/utils";
 
 const baseField =
@@ -64,13 +73,22 @@ export function Field({
   children: ReactNode;
   htmlFor?: string;
 }) {
+  // Associate the label with the wrapped control even when no id is passed,
+  // so screen readers announce every field by name.
+  const autoId = useId();
+  const id = htmlFor ?? autoId;
+  const control =
+    isValidElement<{ id?: string }>(children) && !htmlFor && !(children.props as { id?: string })?.id
+      ? cloneElement(children, { id })
+      : children;
+
   return (
     <div className="space-y-1.5">
-      <label htmlFor={htmlFor} className="block text-sm font-medium text-brand-900">
+      <label htmlFor={id} className="block text-sm font-medium text-brand-900">
         {label}
         {required && <span className="text-red-500"> *</span>}
       </label>
-      {children}
+      {control}
       {error ? (
         <p className="text-xs text-red-600" role="alert">
           {error}
