@@ -397,7 +397,7 @@ function ConfirmArchiving(props: { open: boolean; onClose: () => void; onConfirm
     <ConfirmDialog
       {...props}
       title="Archive this book?"
-      message="Archived books are hidden from the storefront but remain linked to past orders. You can re-activate them any time."
+      message="Books that appear in existing orders are archived — hidden from the storefront, re-activatable any time. Books that have never been ordered are removed permanently."
       confirmLabel="Archive book"
       danger
     />
@@ -1047,10 +1047,10 @@ export function AdminReturnsPage() {
 export function AdminUsersPage() {
   const queryClient = useQueryClient();
   const [q, setQ] = useState("");
-  const [page, setPage] = useState(1);
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin-users", q, page],
-    queryFn: () => adminApi.users({ q, page, page_size: 15 }).then((r) => r.data),
+  // The users endpoint returns a bare array (search server-side, page_size caps at 60).
+  const { data: users, isLoading } = useQuery({
+    queryKey: ["admin-users", q],
+    queryFn: () => adminApi.users({ q, page_size: 60 }).then((r) => r.data),
   });
 
   const update = useMutation({
@@ -1067,11 +1067,11 @@ export function AdminUsersPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-serif text-2xl font-bold text-brand-900">Users</h1>
-          <p className="text-sm text-brand-400">{data ? `${data.total} registered accounts` : "Customer accounts"}</p>
+          <p className="text-sm text-brand-400">{users ? `${users.length} registered accounts` : "Customer accounts"}</p>
         </div>
         <input
           value={q}
-          onChange={(e) => { setQ(e.target.value); setPage(1); }}
+          onChange={(e) => setQ(e.target.value)}
           placeholder="Search name, email, username…"
           className="h-10 w-64 rounded-lg border border-brand-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/30"
           aria-label="Search users"
@@ -1080,16 +1080,15 @@ export function AdminUsersPage() {
 
       {isLoading ? (
         <TableSkeleton />
-      ) : !data || data.items.length === 0 ? (
+      ) : !users || users.length === 0 ? (
         <EmptyState title="No users found" />
       ) : (
-        <>
-          <Table>
-            <THead>
-              <tr><TH>User</TH><TH>Role</TH><TH>Orders</TH><TH>Spent</TH><TH>Status</TH><TH className="text-right">Actions</TH></tr>
-            </THead>
-            <TBody>
-              {data.items.map((u) => (
+        <Table>
+          <THead>
+            <tr><TH>User</TH><TH>Role</TH><TH>Orders</TH><TH>Spent</TH><TH>Status</TH><TH className="text-right">Actions</TH></tr>
+          </THead>
+          <TBody>
+            {users.map((u) => (
                 <TR key={u.id}>
                   <TD>
                     <div className="flex items-center gap-3">
@@ -1134,8 +1133,6 @@ export function AdminUsersPage() {
               ))}
             </TBody>
           </Table>
-          <Pagination page={data.page} pages={data.pages} onChange={setPage} />
-        </>
       )}
     </div>
   );
@@ -1340,11 +1337,6 @@ export function AdminSettingsPage() {
   const { data: settings, isLoading } = useQuery({ queryKey: ["admin-settings"], queryFn: () => adminApi.settings().then((r) => r.data) });
   const [form, setForm] = useState<Record<string, string>>({});
 
-  if (isLoading || !settings) return <PageLoader />;
-
-  const value = (k: keyof typeof settings) => form[k] ?? String(settings[k]);
-  const set = (k: string, v: string) => setForm({ ...form, [k]: v });
-
   const save = useMutation({
     mutationFn: () => {
       const payload: Record<string, number | string> = {};
@@ -1360,6 +1352,11 @@ export function AdminSettingsPage() {
     },
     onError: (err: any) => toast.error(err?.response?.data?.error?.message ?? "Could not save settings"),
   });
+
+  if (isLoading || !settings) return <PageLoader />;
+
+  const value = (k: keyof typeof settings) => form[k] ?? String(settings[k]);
+  const set = (k: string, v: string) => setForm({ ...form, [k]: v });
 
   const numericFields: [string, string, string][] = [
     ["tax_percent", "Tax percent", "Applied to the discounted subtotal at checkout"],
