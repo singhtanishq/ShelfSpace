@@ -69,14 +69,15 @@ export function BookDetailPage() {
   const myReview = reviews?.items.find((r) => r.user_id === user?.id);
 
   const onAddToCart = async () => {
+    const copy = quantity === 1 ? "copy" : "copies";
     if (!accessToken) {
       for (let i = 0; i < quantity; i++) addItem(book.id, 1);
-      toast.success(`Added ${quantity} copy to your cart`);
+      toast.success(`Added ${quantity} ${copy} to your cart`);
       return;
     }
     try {
       await cartApi.addItem(book.id, quantity);
-      toast.success(`Added ${quantity} copy to your cart`);
+      toast.success(`Added ${quantity} ${copy} to your cart`);
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     } catch (err: any) {
       toast.error(err?.response?.data?.error?.message ?? "Could not add to cart");
