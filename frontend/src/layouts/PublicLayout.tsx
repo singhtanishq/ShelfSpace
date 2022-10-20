@@ -60,7 +60,10 @@ export function PublicLayout() {
     }
     clearSession();
     toast.success("Signed out. See you soon!");
-    navigate("/");
+    // A full navigation guarantees a clean store and leaves the user on the
+    // storefront even when signing out from a protected page (a client-side
+    // navigate would race the auth guard's redirect to /login).
+    window.location.assign("/");
   };
 
   const onSearch = (e: React.FormEvent) => {
@@ -141,32 +144,38 @@ export function PublicLayout() {
 
             {accessToken ? (
               <div className="relative ml-1 hidden sm:block">
-                <div>
-                  <details className="group">
-                    <summary className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full bg-brand-700 text-sm font-semibold text-white">
-                      {user?.full_name?.charAt(0).toUpperCase() ?? "U"}
-                    </summary>
-                    <div className="absolute right-0 z-50 mt-2 w-48 rounded-xl border border-brand-100 bg-white py-1 shadow-lg">
-                      <Link to="/account" className="block px-4 py-2 text-sm text-brand-700 hover:bg-brand-50">
-                        My account
+                <details
+                  className="group"
+                  onClick={(e) => {
+                    // Close the menu after choosing an entry; <details> would
+                    // otherwise stay open across client-side navigation.
+                    const target = e.target as HTMLElement;
+                    if (target.closest("a, button")) e.currentTarget.open = false;
+                  }}
+                >
+                  <summary className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full bg-brand-700 text-sm font-semibold text-white">
+                    {user?.full_name?.charAt(0).toUpperCase() ?? "U"}
+                  </summary>
+                  <div className="absolute right-0 z-50 mt-2 w-48 rounded-xl border border-brand-100 bg-white py-1 shadow-lg">
+                    <Link to="/account" className="block px-4 py-2 text-sm text-brand-700 hover:bg-brand-50">
+                      My account
+                    </Link>
+                    <Link to="/account/orders" className="block px-4 py-2 text-sm text-brand-700 hover:bg-brand-50">
+                      My orders
+                    </Link>
+                    {user?.role === "admin" && (
+                      <Link to="/admin" className="block px-4 py-2 text-sm text-brand-700 hover:bg-brand-50">
+                        Admin dashboard
                       </Link>
-                      <Link to="/account/orders" className="block px-4 py-2 text-sm text-brand-700 hover:bg-brand-50">
-                        My orders
-                      </Link>
-                      {user?.role === "admin" && (
-                        <Link to="/admin" className="block px-4 py-2 text-sm text-brand-700 hover:bg-brand-50">
-                          Admin dashboard
-                        </Link>
-                      )}
-                      <button
-                        onClick={onLogout}
-                        className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-                      >
-                        <LogOut className="h-4 w-4" /> Sign out
-                      </button>
-                    </div>
-                  </details>
-                </div>
+                    )}
+                    <button
+                      onClick={onLogout}
+                      className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <LogOut className="h-4 w-4" /> Sign out
+                    </button>
+                  </div>
+                </details>
               </div>
             ) : (
               <div className="ml-2 hidden items-center gap-2 sm:flex">
