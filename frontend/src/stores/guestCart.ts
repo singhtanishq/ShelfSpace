@@ -15,6 +15,7 @@ export interface GuestCartItem {
 interface GuestCartState {
   items: GuestCartItem[];
   addItem: (bookId: number, quantity?: number) => void;
+  setQuantity: (bookId: number, quantity: number) => void;
   removeItem: (bookId: number) => void;
   clear: () => void;
 }
@@ -35,6 +36,13 @@ export const useGuestCart = create<GuestCartState>()(
           }
           return { items: [...state.items, { book_id: bookId, quantity }] };
         }),
+      setQuantity: (bookId, quantity) =>
+        set((state) => ({
+          items:
+            quantity <= 0
+              ? state.items.filter((i) => i.book_id !== bookId)
+              : state.items.map((i) => (i.book_id === bookId ? { ...i, quantity: Math.min(quantity, 99) } : i)),
+        })),
       removeItem: (bookId) =>
         set((state) => ({ items: state.items.filter((i) => i.book_id !== bookId) })),
       clear: () => set({ items: [] }),
