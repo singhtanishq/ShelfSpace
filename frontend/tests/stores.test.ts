@@ -25,6 +25,18 @@ describe("guestCart store", () => {
     expect(useGuestCart.getState().items[0].quantity).toBe(99);
   });
 
+  it("sets an absolute quantity and removes at zero", () => {
+    useGuestCart.getState().addItem(1, 1);
+    useGuestCart.getState().addItem(2, 1);
+    useGuestCart.getState().setQuantity(1, 5);
+    expect(useGuestCart.getState().items).toEqual([
+      { book_id: 1, quantity: 5 },
+      { book_id: 2, quantity: 1 },
+    ]);
+    useGuestCart.getState().setQuantity(2, 0);
+    expect(useGuestCart.getState().items).toEqual([{ book_id: 1, quantity: 5 }]);
+  });
+
   it("removes and clears items", () => {
     useGuestCart.getState().addItem(1, 1);
     useGuestCart.getState().addItem(2, 1);
