@@ -21,10 +21,10 @@ class InvoicePDF(FPDF):
 
     def header(self):
         self.set_font("helvetica", "B", 20)
-        self.cell(0, 10, self.store_name, new_x=XPos.LM, new_y=YPos.NEXT)
+        self.cell(0, 10, self.store_name, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
         self.set_font("helvetica", "", 9)
         self.set_text_color(110, 118, 135)
-        self.cell(0, 5, self.support_email, new_x=XPos.LM, new_y=YPos.NEXT)
+        self.cell(0, 5, self.support_email, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
         self.set_text_color(0, 0, 0)
         self.ln(4)
 
@@ -32,7 +32,7 @@ class InvoicePDF(FPDF):
         self.set_y(-18)
         self.set_font("helvetica", "", 8)
         self.set_text_color(140, 145, 155)
-        self.cell(0, 5, f"Thank you for shopping with {self.store_name}!", align="C", new_x=XPos.LM, new_y=YPos.NEXT)
+        self.cell(0, 5, f"Thank you for shopping with {self.store_name}!", align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
         self.cell(0, 5, f"Page {self.page_no()} of {{nb}}", align="C")
 
 
@@ -48,25 +48,25 @@ def generate_invoice(db: Session, order: Order, *, user_name: str, user_email: s
 
     # Title block
     pdf.set_font("helvetica", "B", 15)
-    pdf.cell(0, 8, "TAX INVOICE", new_x=XPos.LM, new_y=YPos.NEXT)
+    pdf.cell(0, 8, "TAX INVOICE", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.set_font("helvetica", "", 9)
     pdf.set_text_color(110, 118, 135)
-    pdf.cell(0, 5, f"Invoice #{'INV-' + order.order_number}", new_x=XPos.LM, new_y=YPos.NEXT)
+    pdf.cell(0, 5, f"Invoice #{'INV-' + order.order_number}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.set_text_color(0, 0, 0)
     pdf.ln(6)
 
     # Two-column meta: bill to / order meta
     y0 = pdf.get_y()
     pdf.set_font("helvetica", "B", 10)
-    pdf.cell(95, 6, "Billed / Shipped to", new_x=XPos.LM, new_y=YPos.NEXT)
+    pdf.cell(95, 6, "Billed / Shipped to", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.set_xy(105, y0)
-    pdf.cell(0, 6, "Order details", new_x=XPos.LM, new_y=YPos.NEXT)
+    pdf.cell(0, 6, "Order details", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
 
     pdf.set_font("helvetica", "", 9)
     addr = order.shipping_address or {}
     x = 105
     pdf.set_x(0)
-    pdf.cell(95, 5, f"{user_name}", new_x=XPos.LM, new_y=YPos.NEXT)
+    pdf.cell(95, 5, f"{user_name}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     meta_rows = [
         f"Order number: {order.order_number}",
         f"Order date: {order.placed_at.strftime('%d %b %Y')}",
@@ -81,7 +81,7 @@ def generate_invoice(db: Session, order: Order, *, user_name: str, user_email: s
     for line in [addr.get("line1", ""), addr.get("line2") or "", f"{addr.get('city', '')}, {addr.get('state', '')} {addr.get('postal_code', '')}", addr.get("country", ""), f"Phone: {addr.get('phone', '')}"]:
         if line.strip():
             pdf.set_x(0)
-            pdf.multi_cell(95, 5, line, new_x=XPos.LM, new_y=YPos.NEXT)
+            pdf.multi_cell(95, 5, line, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
 
     pdf.set_y(max(pdf.get_y(), y) + 6)
 
@@ -126,7 +126,7 @@ def generate_invoice(db: Session, order: Order, *, user_name: str, user_email: s
         bold = label == "Total"
         pdf.set_font("helvetica", "B" if bold else "", 9)
         pdf.cell(38, 7, label, border=0, align="R")
-        pdf.cell(34, 7, f"{currency} {value:,.2f}", border=0, align="R", new_x=XPos.LM, new_y=YPos.NEXT)
+        pdf.cell(34, 7, f"{currency} {value:,.2f}", border=0, align="R", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
 
     pdf.ln(6)
     pdf.set_font("helvetica", "", 8)
