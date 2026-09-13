@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -245,7 +245,7 @@ export function VerifyEmailPage() {
   const [state, setState] = useState<"pending" | "ok" | "error">("pending");
   const [message, setMessage] = useState("");
 
-  useState(() => {
+  useEffect(() => {
     if (!token) {
       setState("error");
       setMessage("This link is missing its verification token.");
@@ -258,7 +258,7 @@ export function VerifyEmailPage() {
         setState("error");
         setMessage(apiErrorMessage(err));
       });
-  });
+  }, [token]);
 
   return (
     <AuthShell title="Email verification" subtitle="One quick check and you're all set">
