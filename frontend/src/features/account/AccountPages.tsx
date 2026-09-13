@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, NavLink, Outlet, useLocation, useParams } from "react-router-dom";
-import { Package, MapPin, KeyRound, ClipboardList, Heart, Bell, User as UserIcon, FileDown, RotateCcw, XCircle, Star, Trash2, Plus, Pencil, LogIn, CheckCircle2 } from "lucide-react";
+import { Package, MapPin, KeyRound, ClipboardList, Heart, Bell, User as UserIcon, FileDown, RotateCcw, XCircle, Star, Trash2, Plus, Pencil, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { adminApi, addressApi, authApi, cartApi, notificationsApi, ordersApi, wishlistApi, accountApi, catalogApi } from "@/api/endpoints";
 import { useAuthStore } from "@/stores/auth";
@@ -842,19 +842,6 @@ export function NotificationsPage() {
         </Card>
       ))}
       <Pagination page={data.page} pages={data.pages} onChange={setPage} />
-    </div>
-  );
-}
-
-export function NotSignedIn() {
-  return (
-    <div className="mx-auto max-w-2xl px-4 py-16">
-      <EmptyState
-        icon={<LogIn className="h-10 w-10" aria-hidden />}
-        title="Sign in required"
-        description="Please sign in to view this page."
-        action={<Link to="/login"><Button>Sign in</Button></Link>}
-      />
     </div>
   );
 }

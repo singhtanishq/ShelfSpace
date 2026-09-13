@@ -36,7 +36,3 @@ export function mediaUrl(path: string | null | undefined): string | undefined {
   if (path.startsWith("http")) return path;
   return `/${path}`;
 }
-
-export function truncate(text: string, length = 80): string {
-  return text.length <= length ? text : `${text.slice(0, length - 1)}…`;
-}
