@@ -194,6 +194,10 @@ class StatusUpdateRequest(BaseModel):
     note: Optional[str] = Field(default=None, max_length=255)
 
 
+class CancelOrderRequest(BaseModel):
+    note: Optional[str] = Field(default=None, max_length=255)
+
+
 class ReturnItemInput(BaseModel):
     order_item_id: int
     quantity: int = Field(ge=1, le=99)
