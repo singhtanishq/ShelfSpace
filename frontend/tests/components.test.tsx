@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { BookCard } from "@/components/books/BookCard";
-import { Badge, StatusBadge } from "@/components/ui/Card";
+import { StatusBadge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import type { Book } from "@/types/api";
 
