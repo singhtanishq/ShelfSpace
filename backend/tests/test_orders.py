@@ -102,7 +102,7 @@ class TestOrderStateMachine:
             f"{API}/orders/checkout",
             headers=ch2,
             json={
-                "shipping_address": {"full_name": "J", "phone": "+91 9876543210", "line1": "1 St", "city": "X", "state": "Y", "postal_code": "1", "country": "India"},
+                "shipping_address": {"full_name": "Jane Doe", "phone": "+91 9876543210", "line1": "42 Test Lane", "city": "Mumbai", "state": "Maharashtra", "postal_code": "400001", "country": "India"},
                 "payment_method": "card",
                 "card_number": "4242424242424242",
             },

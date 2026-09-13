@@ -15,7 +15,7 @@ def _deliver_order(client, db, customer_header, admin_header, book, qty=2):
         f"{API}/orders/checkout",
         headers=customer_header,
         json={
-            "shipping_address": {"full_name": "J", "phone": "+91 9876543210", "line1": "1 St", "city": "X", "state": "Y", "postal_code": "1", "country": "India"},
+            "shipping_address": {"full_name": "Jane Doe", "phone": "+91 9876543210", "line1": "42 Test Lane", "city": "Mumbai", "state": "Maharashtra", "postal_code": "400001", "country": "India"},
             "payment_method": "cod",
         },
     )
@@ -43,7 +43,7 @@ class TestReturnEligibility:
             f"{API}/orders/checkout",
             headers=ch,
             json={
-                "shipping_address": {"full_name": "J", "phone": "+91 9876543210", "line1": "1 St", "city": "X", "state": "Y", "postal_code": "1", "country": "India"},
+                "shipping_address": {"full_name": "Jane Doe", "phone": "+91 9876543210", "line1": "42 Test Lane", "city": "Mumbai", "state": "Maharashtra", "postal_code": "400001", "country": "India"},
                 "payment_method": "cod",
             },
         )
