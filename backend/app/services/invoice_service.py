@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Optional
 
 from fpdf import FPDF
+from sqlalchemy.orm import Session
 
 from app.core.database import media_path
 from app.models import Order
