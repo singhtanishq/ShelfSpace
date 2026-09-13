@@ -9,7 +9,7 @@ from tests.conftest import auth_header, checkout, mark_delivered  # noqa: F401
 API = "/api/v1"
 
 
-def _checkout(client, header, book_id, qty=1, payment="cod"):
+def _checkout(client, header, book_id, qty=1, payment="cod", **extra):
     client.post(f"{API}/cart/items", headers=header, json={"book_id": book_id, "quantity": qty})
     resp = client.post(
         f"{API}/orders/checkout",
@@ -25,6 +25,7 @@ def _checkout(client, header, book_id, qty=1, payment="cod"):
                 "country": "India",
             },
             "payment_method": payment,
+            **extra,
         },
     )
     assert resp.status_code == 201, resp.text
