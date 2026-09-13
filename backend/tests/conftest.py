@@ -165,6 +165,38 @@ def auth_header(client, db, user, password="Passw0rd!"):
     return {"Authorization": f"Bearer {token}"}
 
 
+SHIPPING_ADDRESS = {
+    "full_name": "Jane Doe",
+    "phone": "+91 9876543210",
+    "line1": "42 Test Lane",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "postal_code": "400001",
+    "country": "India",
+}
+
+
+def checkout(client, header, book_id, qty=1, payment="cod", **extra):
+    client.post("/api/v1/cart/items", headers=header, json={"book_id": book_id, "quantity": qty})
+    resp = client.post(
+        "/api/v1/orders/checkout",
+        headers=header,
+        json={"shipping_address": dict(SHIPPING_ADDRESS), "payment_method": payment, **extra},
+    )
+    assert resp.status_code == 201, resp.text
+    return resp.json()
+
+
+def mark_delivered(client, admin_header, order_number):
+    """Walk the order through every intermediate status (the state machine
+    forbids skipping stages)."""
+    for status in ("confirmed", "processing", "shipped", "out_for_delivery", "delivered"):
+        resp = client.put(
+            f"/api/v1/admin/orders/{order_number}/status", headers=admin_header, json={"status": status}
+        )
+        assert resp.status_code == 200, resp.text
+
+
 @pytest.fixture()
 def customer(db):
     return make_user(db, "jane_doe", "jane@example.com")
