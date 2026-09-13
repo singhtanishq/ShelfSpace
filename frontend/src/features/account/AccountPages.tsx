@@ -301,6 +301,11 @@ export function OrderDetailPage({ adminMode = false }: { adminMode?: boolean }) 
                       {formatCurrency(item.unit_price)} × {item.quantity}
                     </p>
                     {returnedQty >= item.quantity && <p className="text-xs font-medium text-brand-400">Fully returned</p>}
+                    {item.book_id && ["delivered", "returned"].includes(order.status) && (
+                      <Link to={`/books/${item.slug}`} className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:text-brand-800">
+                        <Star className="h-3 w-3" aria-hidden /> Rate & review
+                      </Link>
+                    )}
                   </div>
                   <p className="font-bold text-brand-900">{formatCurrency(item.line_total)}</p>
                 </div>
