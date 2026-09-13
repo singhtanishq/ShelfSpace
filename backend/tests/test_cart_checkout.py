@@ -27,7 +27,7 @@ class TestCart:
 
     def test_quantity_beyond_stock_rejected(self, client, db, customer, book):
         header = auth_header(client, db, customer)
-        resp = _add_to_cart(client, header, book.id, book.stock_quantity + 1)
+        resp = _add_to_cart(client, header, book.id, book.inventory.stock_quantity + 1)
         assert resp.status_code == 400
 
     def test_update_and_remove(self, client, db, customer, book):
@@ -91,7 +91,7 @@ class TestCheckout:
         assert order["payment_status"] == "pending"  # COD
         assert order["items"][0]["quantity"] == 3
         db.refresh(book.inventory)
-        assert book.inventory.stock_quantity == book.stock_quantity - 3
+        assert book.inventory.stock_quantity == book.inventory.stock_quantity - 3
 
     def test_mock_card_payment_is_paid(self, client, db, customer, book):
         header = auth_header(client, db, customer)
