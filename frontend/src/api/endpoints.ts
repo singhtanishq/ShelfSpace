@@ -71,7 +71,6 @@ export const catalogApi = {
   updateReview: (id: number, data: { rating?: number; title?: string; content?: string }) =>
     api.put<Review>(`/reviews/${id}`, data),
   deleteReview: (id: number) => api.delete(`/reviews/${id}`),
-  myReviews: () => api.get<Review[]>("/admin/reviews"), // replaced below; see accountApi
 };
 
 // ---------------------------------------------------------------- cart & wishlist
@@ -215,6 +214,5 @@ export const adminApi = {
 
 // ---------------------------------------------------------------- account extras
 export const accountApi = {
-  myReviews: () =>
-    api.get<Paginated<Review>>("/admin/reviews").catch(() => null), // customers have no admin route; use per-book data
+  myReviews: () => api.get<Review[]>("/account/reviews"),
 };
