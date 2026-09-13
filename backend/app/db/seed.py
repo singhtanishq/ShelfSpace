@@ -43,6 +43,7 @@ from app.db.seeds.seed_data import (
     CATEGORIES,
     COUPONS,
     CUSTOMERS,
+    PUBLISHERS,
     REVIEW_SNIPPETS,
 )
 
