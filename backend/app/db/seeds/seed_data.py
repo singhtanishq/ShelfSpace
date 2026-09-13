@@ -2,7 +2,7 @@
 
 ADMINS = [
     {
-        "email": "admin@shelfspace.test",
+        "email": "admin@example.com",
         "username": "admin",
         "full_name": "Aarav Mehta",
         "password": "Admin@123",
