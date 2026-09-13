@@ -92,7 +92,7 @@ def admin_update_user(
             notification_service.notify(
                 db,
                 user=user,
-                type=notification_service.NotificationType.ACCOUNT,
+                type=NotificationType.ACCOUNT,
                 title="Account deactivated",
                 body="Your account has been deactivated by an administrator. Contact support for assistance.",
             )
