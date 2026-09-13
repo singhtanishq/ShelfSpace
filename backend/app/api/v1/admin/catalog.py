@@ -23,7 +23,7 @@ from app.schemas.catalog import (
     TermUpdate,
 )
 from app.services import catalog_service, inventory_service
-from app.utils.exceptions import NotFoundError, ValidationError
+from app.utils.exceptions import ValidationError
 from app.utils.pagination import PaginationParams
 from app.utils.serializers import book_detail
 
@@ -60,7 +60,7 @@ def admin_get_book(
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
-    return book_detail(catalog_service._get_book_or_404(db, book_id))
+    return book_detail(catalog_service.get_book_by_id(db, book_id))
 
 
 @router.post("/admin/books", response_model=AdminBook, status_code=201)
