@@ -42,7 +42,7 @@ def return_window_days(db: Session) -> int:
 def _eligible_order(db: Session, order_number: str, user: Optional[User], require_admin: bool) -> Order:
     order = (
         db.query(Order)
-        .options(selectinload(Order.items), selectinload(Order.returns).selectinload("items"))
+        .options(selectinload(Order.items), selectinload(Order.returns).selectinload(ReturnRequest.items))
         .filter(Order.order_number == order_number)
         .first()
     )
