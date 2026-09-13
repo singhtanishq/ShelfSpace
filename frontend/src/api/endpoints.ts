@@ -7,7 +7,6 @@ import type {
   AdminUser,
   AuditLog,
   Book,
-  Cart,
   Cart as CartType,
   ChartData,
   Coupon,

@@ -18,7 +18,6 @@ const NAV_LINKS = [
 export function PublicLayout() {
   const navigate = useNavigate();
   const { user, accessToken, clearSession, getRefreshToken } = useAuthStore();
-  const addItem = useGuestCart((s) => s.addItem);
   const guestItems = useGuestCart((s) => s.items);
   const [cartCount, setCartCount] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -142,7 +141,7 @@ export function PublicLayout() {
 
             {accessToken ? (
               <div className="relative ml-1 hidden sm:block">
-                <Menu as="div">
+                <div>
                   <details className="group">
                     <summary className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full bg-brand-700 text-sm font-semibold text-white">
                       {user?.full_name?.charAt(0).toUpperCase() ?? "U"}
@@ -167,7 +166,7 @@ export function PublicLayout() {
                       </button>
                     </div>
                   </details>
-                </Menu>
+                </div>
               </div>
             ) : (
               <div className="ml-2 hidden items-center gap-2 sm:flex">

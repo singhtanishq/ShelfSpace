@@ -40,7 +40,3 @@ export function GuestOnly() {
   return <Outlet />;
 }
 
-export function useHydratedAuth() {
-  const hydrated = useAuthStore((s) => s.hydrated);
-  return hydrated;
-}
