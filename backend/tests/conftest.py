@@ -6,6 +6,7 @@ import os
 # Must be set before app modules import settings.
 os.environ["EMAIL_WORKER_ENABLED"] = "false"
 os.environ["EMAIL_ENABLED"] = "false"
+os.environ["MEDIA_DIR"] = "/tmp/shelfspace-test-media"
 
 import pytest
 from fastapi.testclient import TestClient
