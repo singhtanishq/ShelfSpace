@@ -13,7 +13,7 @@ from app.services import audit_service, order_service, return_service
 from app.utils.pagination import PaginationParams
 from app.utils.serializers import order_public, return_public
 
-router = APIRouter(prefix="/admin", tags=["admin-orders"])
+router = APIRouter(tags=["admin-orders"])
 
 
 @router.get("/admin/orders", response_model=OrderList)

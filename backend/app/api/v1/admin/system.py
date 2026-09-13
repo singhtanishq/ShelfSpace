@@ -16,7 +16,7 @@ from app.utils.exceptions import ConflictError, NotFoundError
 from app.utils.pagination import PaginationParams
 from app.utils.serializers import review_public
 
-router = APIRouter(prefix="/admin", tags=["admin-misc"])
+router = APIRouter(tags=["admin-misc"])
 
 
 # ---------------------------------------------------------------------------
