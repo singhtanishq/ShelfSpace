@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2 style="margin:0 0 12px;font-size:19px;color:#111827;">Order {{ order_number }} confirmed</h2>
+  <p style="margin:0 0 16px;">Hi {{ user_name }}, thank you for your order! Here's what you purchased:</p>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:0 0 16px;">
+    <tr style="background:#f9fafb;">
+      <th align="left" style="padding:8px 12px;font-size:12px;color:#6b7280;border-bottom:1px solid #e5e7eb;">Book</th>
+      <th align="center" style="padding:8px 12px;font-size:12px;color:#6b7280;border-bottom:1px solid #e5e7eb;">Qty</th>
+      <th align="right" style="padding:8px 12px;font-size:12px;color:#6b7280;border-bottom:1px solid #e5e7eb;">Amount</th>
+    </tr>
+    {% for item in items %}
+    <tr>
+      <td style="padding:8px 12px;border-bottom:1px solid #f3f4f6;">{{ item.title }}</td>
+      <td align="center" style="padding:8px 12px;border-bottom:1px solid #f3f4f6;">{{ item.quantity }}</td>
+      <td align="right" style="padding:8px 12px;border-bottom:1px solid #f3f4f6;">{{ currency }}{{ "%.2f"|format(item.line_total) }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td colspan="2" align="right" style="padding:8px 12px;font-weight:700;">Total</td>
+      <td align="right" style="padding:8px 12px;font-weight:700;">{{ currency }}{{ "%.2f"|format(total) }}</td>
+    </tr>
+  </table>
+  <p style="margin:0 0 8px;color:#6b7280;font-size:13px;">Payment method: {{ payment_method | upper }}</p>
+  <p style="margin:0;color:#6b7280;font-size:13px;">Track your order any time from your account's Orders page.</p>
+{% endblock %}
