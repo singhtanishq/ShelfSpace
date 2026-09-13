@@ -6,6 +6,7 @@ across every lifecycle stage, reviews, coupons and settings.
 
 import random
 import sys
+import zlib
 from datetime import datetime, timedelta, timezone
 
 from app.core.database import SessionLocal, media_path, create_engine  # noqa
@@ -59,10 +60,14 @@ PALETTES = [
 
 def generate_cover(title: str, author: str) -> str:
     """Create a simple, tasteful SVG cover so the catalog looks alive offline."""
-    idx = sum(ord(c) for c in title) % len(PALETTES)
+    idx = zlib.crc32(title.encode("utf-8")) % len(PALETTES)
     dark, light = PALETTES[idx]
-    short_title = title if len(title) <= 34 else title[:32].rstrip() + "…"
-    short_author = author if len(author) <= 30 else author[:28] + "…"
+    short_title = title if len(title) <= 34 else title[:32].rstrip() + "..."
+    short_author = author if len(author) <= 30 else author[:28] + "..."
+    lines = _wrap(short_title, 20)
+    tspans = "".join(
+        f'<tspan x="40" dy="{40 if i else 0}">{line}</tspan>' for i, line in enumerate(lines)
+    )
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
@@ -73,13 +78,11 @@ def generate_cover(title: str, author: str) -> str:
   <rect width="400" height="600" fill="url(#g)"/>
   <rect x="0" y="0" width="18" height="600" fill="rgba(0,0,0,0.25)"/>
   <rect x="40" y="60" width="52" height="4" fill="rgba(255,255,255,0.85)"/>
-  <text x="40" y="130" font-family="Georgia, serif" font-size="30" fill="#ffffff" font-weight="bold">
-    {'</tspan><tspan x="40" dy="40">'.join(_wrap(short_title, 20))}
-  </text>
+  <text x="40" y="130" font-family="Georgia, serif" font-size="30" fill="#ffffff" font-weight="bold">{tspans}</text>
   <text x="40" y="520" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="rgba(255,255,255,0.85)">{_esc(short_author)}</text>
   <text x="40" y="556" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.5)" letter-spacing="3">SHELFSPACE</text>
 </svg>"""
-    filename = f"cover-{abs(hash(title)) % 10_000_000:07d}.svg"
+    filename = f"cover-{zlib.crc32(title.encode('utf-8')) % 10_000_000:07d}.svg"
     path = media_path("covers", filename)
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(svg)
