@@ -10,6 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
 if TYPE_CHECKING:
+    from app.models.cart import Cart
     from app.models.order import Order
     from app.models.review import Review
 
@@ -51,6 +52,7 @@ class User(Base):
     )
     orders: Mapped[List["Order"]] = relationship(back_populates="user")
     reviews: Mapped[List["Review"]] = relationship(back_populates="user")
+    cart: Mapped[Optional["Cart"]] = relationship(back_populates="user", uselist=False)
 
     def __repr__(self) -> str:  # pragma: no cover
         return f"<User id={self.id} username={self.username!r}>"
