@@ -9,7 +9,7 @@ Business rules (configurable via store settings):
 - Completed replacements issue new copies from stock.
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from sqlalchemy.orm import Session, selectinload
@@ -20,6 +20,7 @@ from app.models import (
     Order,
     OrderItem,
     OrderStatus,
+    PaymentStatus,
     RefundStatus,
     ReturnItem,
     ReturnReason,
