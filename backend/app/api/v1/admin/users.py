@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_admin_user
 from app.core.database import get_db
-from app.models import Order, OrderStatus, PaymentStatus, User, UserRole
+from app.models import NotificationType, Order, OrderStatus, PaymentStatus, User, UserRole
 from app.schemas.user import AdminUserPublic, AdminUserUpdate
 from app.services import audit_service, notification_service
 from app.utils.exceptions import BusinessRuleError, NotFoundError
