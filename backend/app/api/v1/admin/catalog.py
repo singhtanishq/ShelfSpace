@@ -11,9 +11,14 @@ from app.models import Author, Book, Category, Inventory, Publisher, User
 from app.schemas.admin import AuditLogList
 from app.schemas.catalog import (
     AdminBook,
+    AuthorPublic,
+    BookCreate,
+    BookUpdate,
+    CategoryPublic,
     InventoryAdjustRequest,
     InventoryRow,
     InventoryTransactionPublic,
+    PublisherPublic,
     TermCreate,
     TermUpdate,
 )
