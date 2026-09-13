@@ -399,3 +399,9 @@ lerna-debug.log*
 # =========================================================
 
 auto-push.sh
+# =========================================================
+# ShelfSpace — uploaded media / generated artifacts
+# =========================================================
+backend/media/
+!backend/media/.gitkeep
+frontend/coverage/
