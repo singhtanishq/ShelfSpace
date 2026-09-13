@@ -13,7 +13,6 @@ deliver from a worker.
 
 import smtplib
 import threading
-import time
 from datetime import datetime
 from email.message import EmailMessage
 from typing import Any, Dict, Optional
@@ -165,6 +164,3 @@ def stop_worker() -> None:  # pragma: no cover
 # Backwards-compatible helper used by the seed script to flush the queue once.
 def drain_queue_once() -> int:
     return process_queue()
-
-
-_time = time  # keep import used even if time-based logic changes
