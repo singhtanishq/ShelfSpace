@@ -2,7 +2,6 @@
 
 from datetime import datetime, timedelta, timezone
 
-from app.models import Inventory, OrderStatus
 
 from tests.conftest import auth_header, checkout, mark_delivered  # noqa: F401
 

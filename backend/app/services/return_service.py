@@ -19,7 +19,6 @@ from app.models import (
     InventoryChangeType,
     NotificationType,
     Order,
-    OrderItem,
     OrderStatus,
     PaymentStatus,
     RefundStatus,

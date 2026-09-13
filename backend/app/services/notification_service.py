@@ -2,7 +2,6 @@
 
 from typing import Optional
 
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.models import Notification, NotificationType, User

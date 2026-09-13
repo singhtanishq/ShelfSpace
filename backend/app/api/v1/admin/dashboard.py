@@ -1,6 +1,5 @@
 """Admin: dashboard, analytics and low-stock alerts."""
 
-from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session

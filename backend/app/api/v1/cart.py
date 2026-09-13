@@ -1,9 +1,8 @@
 """Cart and wishlist endpoints."""
 
-from datetime import datetime
 from typing import List
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -19,8 +18,7 @@ from app.schemas.order import (
     WishlistItemPublic,
 )
 from app.services import cart_service
-from app.utils.exceptions import ConflictError, NotFoundError
-from app.utils.serializers import book_card
+from app.utils.exceptions import NotFoundError
 
 router = APIRouter(tags=["cart"])
 

@@ -19,7 +19,7 @@ from typing import Any, Dict, Optional
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from sqlalchemy import select
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.logging import get_logger

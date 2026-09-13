@@ -163,7 +163,6 @@ class TestCouponsAdmin:
         assert over.status_code == 422
 
     def test_used_coupon_deactivated_not_deleted(self, client, db, admin):
-        from tests.conftest import make_coupon
 
         ah = auth_header(client, db, admin)
         coupon = make_coupon(db, "USED", value=5, discount_type="fixed", used_count=3)

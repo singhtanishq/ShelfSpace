@@ -1,8 +1,6 @@
 """Professional PDF invoice generation (fpdf2)."""
 
-import os
 from datetime import datetime
-from typing import Optional
 
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
