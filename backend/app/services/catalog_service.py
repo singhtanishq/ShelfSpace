@@ -45,7 +45,11 @@ def query_books(
     page: int = 1,
     page_size: int = 12,
 ) -> Tuple[List[Book], int]:
-    """Search + filter + sort the active catalog. Returns (books, total)."""
+    """Search + filter + sort the active catalog. Returns (books, total).
+
+    Filters use relationship EXISTS predicates (.any()/.has()) so they compose
+    safely without duplicate joins.
+    """
     query = db.query(Book).options(
         selectinload(Book.authors), selectinload(Book.categories), selectinload(Book.inventory)
     )
@@ -54,21 +58,20 @@ def query_books(
 
     if q:
         term = f"%{q.strip()}%"
-        like = or_(
-            Book.title.ilike(term),
-            Book.isbn.ilike(term),
-            Book.description.ilike(term),
+        query = query.filter(
+            or_(
+                Book.title.ilike(term),
+                Book.isbn.ilike(term),
+                Book.description.ilike(term),
+                Book.authors.any(Author.name.ilike(term)),
+                Book.publisher.has(Publisher.name.ilike(term)),
+            )
         )
-        author_ids = [row[0] for row in db.query(Author.id).filter(Author.name.ilike(term)).all()]
-        publisher_ids = [row[0] for row in db.query(Publisher.id).filter(Publisher.name.ilike(term)).all()]
-        query = query.outerjoin(Book.authors).outerjoin(Book.publisher).filter(
-            or_(like, Author.id.in_(author_ids), Publisher.id.in_(publisher_ids))
-        ).distinct()
 
     if category_slug:
-        query = query.join(Book.categories).filter(Category.slug == category_slug)
+        query = query.filter(Book.categories.any(Category.slug == category_slug))
     if author_slug:
-        query = query.join(Book.authors).filter(Author.slug == author_slug)
+        query = query.filter(Book.authors.any(Author.slug == author_slug))
     if language:
         query = query.filter(Book.language == language)
     if min_price is not None:
@@ -78,7 +81,7 @@ def query_books(
     if min_rating is not None and min_rating > 0:
         query = query.filter(Book.rating_avg >= min_rating, Book.rating_count > 0)
     if in_stock:
-        query = query.join(Book.inventory).filter(Inventory.stock_quantity > 0)
+        query = query.filter(Book.inventory.any(Inventory.stock_quantity > 0))
 
     total = query.count()
 
