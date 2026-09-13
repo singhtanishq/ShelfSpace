@@ -183,9 +183,25 @@ const STATUS_STEPS = ["pending", "confirmed", "processing", "shipped", "out_for_
 
 export function OrderDetailPage({ adminMode = false }: { adminMode?: boolean }) {
   const { orderNumber = "" } = useParams();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const [cancelOpen, setCancelOpen] = useState(false);
   const [returnModal, setReturnModal] = useState(false);
+  const justOrdered = !!(location.state as any)?.justOrdered;
+
+  const downloadInvoice = async () => {
+    try {
+      const resp = await ordersApi.invoice(orderNumber);
+      const url = window.URL.createObjectURL(new Blob([resp.data as any], { type: "application/pdf" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `invoice-${orderNumber}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      toast.error("Could not download the invoice");
+    }
+  };
 
   const { data: order, isLoading, isError } = useQuery({
     queryKey: ["order", orderNumber],
