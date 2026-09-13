@@ -11,12 +11,12 @@ from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models import User
 from app.schemas.order import (
+    CancelOrderRequest,
     CheckoutRequest,
     OrderList,
     OrderPublic,
     ReturnCreate,
     ReturnRequestPublic,
-    StatusUpdateRequest,
 )
 from app.services import invoice_service, order_service, return_service
 from app.utils.exceptions import NotFoundError
@@ -77,7 +77,7 @@ def order_detail(
 @router.post("/{order_number}/cancel", response_model=OrderPublic)
 def cancel_order(
     order_number: str,
-    data: StatusUpdateRequest,
+    data: CancelOrderRequest,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
