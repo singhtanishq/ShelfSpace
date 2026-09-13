@@ -1,7 +1,6 @@
 """Catalog business logic: public browsing/search and admin book management."""
 
 import os
-import secrets
 import uuid
 from typing import List, Optional, Tuple
 
