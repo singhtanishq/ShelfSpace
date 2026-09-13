@@ -169,13 +169,11 @@ class TestAddresses:
         assert resp.status_code == 201
         assert resp.json()["is_default"] is True
 
-    def test_cannot_read_other_users_addresses(self, client, db, customer, admin):
-        auth_header(client, db, admin)
-        admin_header = auth_header(client, db, admin)
-        other = auth_header(client, db, customer)
+    def test_addresses_are_scoped_per_user(self, client, db, customer, admin):
+        customer_header = auth_header(client, db, customer)
         client.post(
             "/api/v1/account/addresses",
-            headers=other,
+            headers=customer_header,
             json={
                 "full_name": "Jane Doe",
                 "phone": "+91 9000000000",
@@ -185,7 +183,7 @@ class TestAddresses:
                 "postal_code": "411001",
             },
         )
+        admin_header = auth_header(client, db, admin)
         resp = client.get("/api/v1/account/addresses", headers=admin_header)
-        assert all(a["full_name"] != "Jane Doe" or a["city"] != "Pune" for a in resp.json() if a["city"] == "Pune") or True
-        admin_addresses = client.get("/api/v1/account/addresses", headers=admin_header).json()
-        assert len(admin_addresses) == 0
+        assert resp.status_code == 200
+        assert resp.json() == []
