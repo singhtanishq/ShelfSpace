@@ -61,7 +61,7 @@ def remove_item(db: Session, user: User, book_id: int) -> Cart:
     item = next((i for i in cart.items if i.book_id == book_id), None)
     if item is None:
         raise NotFoundError("This book is not in your cart.")
-    db.delete(item)
+    cart.items.remove(item)  # delete-orphan cascade removes the row
     db.flush()
     return cart
 
