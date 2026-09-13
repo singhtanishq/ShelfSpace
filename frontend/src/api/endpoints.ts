@@ -109,7 +109,8 @@ export const ordersApi = {
   detail: (orderNumber: string) => api.get<Order>(`/orders/${orderNumber}`),
   cancel: (orderNumber: string, note?: string) =>
     api.post<Order>(`/orders/${orderNumber}/cancel`, { note }),
-  invoiceUrl: (orderNumber: string) => `/api/v1/orders/${orderNumber}/invoice`,
+  invoice: (orderNumber: string) =>
+    api.get(`/orders/${orderNumber}/invoice`, { responseType: "blob" }),
   createReturn: (
     orderNumber: string,
     data: {
