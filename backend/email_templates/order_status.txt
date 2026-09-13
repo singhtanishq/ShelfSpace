@@ -1,0 +1,8 @@
+Hi {{ user_name }},
+
+Order {{ order_number }} — {{ headline }}
+
+{{ message }}
+{% if note %}Note: {{ note }}{% endif %}
+
+Current status: {{ status_label }}

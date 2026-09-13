@@ -1,0 +1,9 @@
+Hi {{ user_name }},
+
+{{ request_type|capitalize }} request {{ return_number }} — {{ headline }}
+
+{{ message }}
+{% if note %}Note: {{ note }}{% endif %}
+{% if refund_amount is not none %}Refund amount: {{ currency }}{{ "%.2f"|format(refund_amount) }} ({{ refund_status }}){% endif %}
+
+Manage this request from your account's Orders page.

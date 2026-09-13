@@ -1,0 +1,10 @@
+Hi {{ user_name }},
+
+Thank you for your order {{ order_number }}!
+
+{% for item in items %}  - {{ item.title }} x{{ item.quantity }} = {{ currency }}{{ "%.2f"|format(item.line_total) }}
+{% endfor %}
+Total: {{ currency }}{{ "%.2f"|format(total) }}
+Payment method: {{ payment_method | upper }}
+
+Track your order any time from your account's Orders page.
