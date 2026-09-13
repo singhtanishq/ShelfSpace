@@ -23,6 +23,7 @@ const Account = {
   Layout: lazy(() => import("@/features/account/AccountPages").then((m) => ({ default: m.AccountLayout }))),
   Profile: lazy(() => import("@/features/account/AccountPages").then((m) => ({ default: m.ProfilePage }))),
   Orders: lazy(() => import("@/features/account/AccountPages").then((m) => ({ default: m.OrdersPage }))),
+  OrderDetail: lazy(() => import("@/features/account/AccountPages").then((m) => ({ default: m.OrderDetailPage }))),
 
   Addresses: lazy(() => import("@/features/account/AccountPages").then((m) => ({ default: m.AddressesPage }))),
   Wishlist: lazy(() => import("@/features/account/AccountPages").then((m) => ({ default: m.WishlistPage }))),
