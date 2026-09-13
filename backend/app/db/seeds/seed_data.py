@@ -53,6 +53,22 @@ AUTHORS = [
     ("James Clear", "Writer and speaker focused on habits and continuous improvement."),
     ("Yuval Noah Harari", "Historian and author of the bestselling Sapiens trilogy."),
     ("S. Chandrasekhar", "Physicist and author of popular-science histories."),
+    ("David Foster Wallace", "Essayist and novelist famed for his footnotes and ferocious intelligence."),
+    ("Stieg Larsson", "Swedish journalist whose Millennium trilogy became a global phenomenon."),
+    ("Gillian Flynn", "Author of dark, twist-laden thrillers including Gone Girl."),
+    ("Alex Michaelides", "Screenwriter turned novelist with a taste for psychological puzzles."),
+    ("Tara Westover", "Memoirist who wrote about growing up off the grid and finding education."),
+    ("Michelle Obama", "Attorney, author and former First Lady of the United States."),
+    ("Matt Haig", "British novelist writing hopeful, humane fiction about second chances."),
+    ("Kazuo Ishiguro", "Nobel laureate known for restrained, devastating first-person fiction."),
+    ("Frank Herbert", "Creator of the Dune universe and ecological science fiction."),
+    ("J. R. R. Tolkien", "Philologist who more or less invented modern fantasy."),
+    ("Sally Rooney", "Irish novelist of millennial intimacy and class."),
+    ("Delia Owens", "Wildlife scientist turned bestselling novelist."),
+    ("Marcus Aurelius", "Roman emperor and Stoic philosopher."),
+    ("Daniel Kahneman", "Nobel-winning psychologist of judgment and decision-making."),
+    ("Héctor García", "Japanese-based Spanish author writing on longevity and wellbeing."),
+    ("Francesc Miralles", "Spanish author of self-help and fiction, co-writer of Ikigai."),
 ]
 
 PUBLISHERS = [
