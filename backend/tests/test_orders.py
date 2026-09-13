@@ -4,6 +4,8 @@ from datetime import datetime, timedelta, timezone
 
 from app.models import Inventory, Order, OrderStatus
 
+from tests.conftest import auth_header  # noqa: F401
+
 API = "/api/v1"
 
 

@@ -1,5 +1,7 @@
 """Reviews: verified purchases, duplicate prevention, rating aggregates, moderation."""
 
+from tests.conftest import auth_header  # noqa: F401
+
 API = "/api/v1"
 
 
