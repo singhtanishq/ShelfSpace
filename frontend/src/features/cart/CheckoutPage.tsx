@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Banknote, CreditCard, Smartphone, CheckCircle2, Plus, Pencil } from "lucide-react";
@@ -52,11 +52,13 @@ export function CheckoutPage() {
     [addresses]
   );
 
-  useMemo(() => {
+  // Preselect the default address once addresses load.
+  useEffect(() => {
     if (defaultAddress && selectedAddressId === "new" && addresses && addresses.length > 0 && selectedAddressId !== "new") {
-      // no-op: keeps types honest
+      setSelectedAddressId(defaultAddress.id);
     }
-  }, [defaultAddress, addresses, selectedAddressId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addresses]);
 
   const saveAddress = useMutation({
     mutationFn: () =>
