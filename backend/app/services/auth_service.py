@@ -1,6 +1,5 @@
 """Authentication and account management business logic."""
 
-import secrets  # noqa: F401  (reserved for future token schemes)
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Tuple
 
