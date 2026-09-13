@@ -1,6 +1,12 @@
 """Shared pytest fixtures. The suite runs against in-memory SQLite by default;
 set TEST_DATABASE_URL to run against MySQL instead."""
 
+import os
+
+# Must be set before app modules import settings.
+os.environ["EMAIL_WORKER_ENABLED"] = "false"
+os.environ["EMAIL_ENABLED"] = "false"
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
