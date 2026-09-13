@@ -2,6 +2,8 @@
 
 API = "/api/v1"
 
+from tests.conftest import auth_header  # noqa: F401
+
 
 def _add_to_cart(client, header, book_id, qty=1):
     return client.post(f"{API}/cart/items", headers=header, json={"book_id": book_id, "quantity": qty})
