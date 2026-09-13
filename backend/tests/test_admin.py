@@ -192,7 +192,7 @@ class TestSettingsAndAudit:
 
     def test_notifications_flow(self, client, db, customer, admin, book):
         ch = auth_header(client, db, customer)
-        ah = auth_header(client, db, admin)
+        auth_header(client, db, admin)
         checkout(client, ch, book.id)
         resp = client.get("/api/v1/notifications", headers=ch).json()
         assert resp["total"] >= 1
