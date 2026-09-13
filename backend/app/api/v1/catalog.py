@@ -7,13 +7,18 @@ from app.api.deps import get_current_user, get_optional_user
 from app.core.database import get_db
 from app.models import Author, Book, Category, Publisher, User
 from app.schemas.catalog import (
+    AuthorPublic,
     BookDetail,
     BookList,
     CatalogFacets,
+    CategoryPublic,
     HomeFeed,
+    PublisherPublic,
     RelatedBooks,
+    ReviewCreate,
     ReviewList,
     ReviewPublic,
+    ReviewUpdate,
 )
 from app.services import catalog_service, review_service
 from app.utils.pagination import PaginationParams, Page
