@@ -50,7 +50,7 @@ class TestBookAdmin:
     def test_archive_protects_order_history(self, client, db, customer, admin, book):
         ch = auth_header(client, db, customer)
         ah = auth_header(client, db, admin)
-        order = checkout(client, ch, book.id)
+        checkout(client, ch, book.id)
 
         hard = client.delete(f"/api/v1/admin/books/{book.id}?hard=true", headers=ah)
         assert hard.status_code == 422

@@ -1,8 +1,8 @@
 """Cart behavior and transactional checkout (incl. oversell prevention)."""
 
-API = "/api/v1"
-
 from tests.conftest import auth_header  # noqa: F401
+
+API = "/api/v1"
 
 
 def _add_to_cart(client, header, book_id, qty=1):
@@ -47,7 +47,7 @@ class TestCart:
     def test_coupon_application(self, client, db, customer, book):
         from tests.conftest import make_coupon
 
-        coupon = make_coupon(db, "SAVE10", discount_type="percent", value=10)
+        make_coupon(db, "SAVE10", discount_type="percent", value=10)
         header = auth_header(client, db, customer)
         _add_to_cart(client, header, book.id, 1)  # 100
         resp = client.post(f"{API}/cart/coupon", headers=header, json={"code": "SAVE10"})
