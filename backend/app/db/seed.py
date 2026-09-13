@@ -110,11 +110,13 @@ def seed(fresh: bool = False) -> None:
 
     if fresh:
         logger.info("Wiping existing data…")
-        for table in reversed(db.get_bind().table_names()):
+        from sqlalchemy import create_engine as _ce, inspect, text as _text
+
+        inspector = inspect(engine)
+        tables = reversed(inspector.get_table_names())
+        for table in tables:
             if table != "alembic_version":
-                db.execute(
-                    __import__("sqlalchemy").text(f"SET FOREIGN_KEY_CHECKS=0; DROP TABLE IF EXISTS {table}; SET FOREIGN_KEY_CHECKS=1;")
-                )
+                db.execute(_text(f"SET FOREIGN_KEY_CHECKS=0; DROP TABLE IF EXISTS {table}; SET FOREIGN_KEY_CHECKS=1;"))
         db.commit()
 
     if db.query(User).count() > 0:
